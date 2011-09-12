@@ -35,6 +35,6 @@ PLi/RemoteControlChannel/Makefile
 PLi/ScreenPosition/Makefile
 PLi/StreamInterface/Makefile
 PLi/SnmpAgent/Makefile
-UPnP/Makefile
-UPnP/UShare/Makefile
+Extensions/Makefile
+Extensions/UShare/Makefile
 ])
