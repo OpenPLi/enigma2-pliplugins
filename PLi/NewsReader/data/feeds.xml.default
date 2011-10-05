@@ -3,23 +3,23 @@
 <feeds>
 	<feed>
 		<name>[NL] SAT: PLi Gebruikersondersteuning</name>
-		<url>http://www.pli-images.org/feeds.php?type=forum&#38;id=64</url>
+		<url>http://openpli.org/forums/rss/forums/1-nl-gebruikersondersteuning</url>
 	</feed>
 	<feed>
 		<name>[EN] SAT: PLi Enduser support</name>
-		<url>http://www.pli-images.org/feeds.php?type=forum&#38;id=65</url>
+		<url>http://openpli.org/forums/rss/forums/2-en-enduser-support</url>
 	</feed>
 	<feed>
 		<name>[DE] SAT: PLi Benutzerunterstutzung</name>
-		<url>http://www.pli-images.org/feeds.php?type=forum&#38;id=66</url>
+		<url>http://openpli.org/forums/rss/forums/3-de-benutzerunterstutzung</url>
 	</feed>	
 	<feed>
 		<name>[EN] SAT: PLi/Rytec XMLTV and EPG support</name>
-		<url>http://www.pli-images.org/feeds.php?type=forum&#38;id=62</url>
+		<url>http://openpli.org/forums/rss/forums/4-en-plirytec-xmltv-and-epg-support</url>
 	</feed>
 	<feed>
 		<name>[EN] SAT: PLi images: Third-Party Development</name>
-		<url>http://www.pli-images.org/feeds.php?type=forum&#38;id=48</url>
+		<url>http://openpli.org/forums/rss/forums/5-en-openpli-third-party-development</url>
 	</feed>
 	<feed>
 		<name>[NL] SAT: Satellietforum nieuws</name>
