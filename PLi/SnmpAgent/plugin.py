@@ -1,4 +1,4 @@
-import time
+import time,platform
 from enigma import eTimer, iFrontendInformation, iPlayableService
 from Plugins.Plugin import PluginDescriptor
 from Components.config import config, ConfigText, ConfigYesNo, ConfigSubsection
@@ -16,10 +16,15 @@ from enigma import eDVBResourceManager, eDVBFrontendParametersSatellite, eDVBFro
 from bitrate import Bitrate
 from emm import Emm
 
+from cpu import GetCPUStatForType, CPUStatTypes
+from loadavr import GetCPULoadForType, CPULoadTypes
+from memory import GetMemoryForType, MemoryTypes
+from disk import GetDiskInfo, DiskInfoTypes
+
 config.plugins.SnmpAgent = ConfigSubsection()
 config.plugins.SnmpAgent.managerip = ConfigText(default = '0.0.0.0')
-config.plugins.SnmpAgent.systemname = ConfigText(default = 'dm7025')
-config.plugins.SnmpAgent.systemdescription = ConfigText(default = 'signal quality monitor')
+config.plugins.SnmpAgent.systemname = ConfigText(default = platform.node() )
+config.plugins.SnmpAgent.systemdescription = ConfigText(default = 'SNMP Agent for Enigma2')
 config.plugins.SnmpAgent.supportaddress = ConfigText(default = 'support@somewhere.tv')
 config.plugins.SnmpAgent.location = ConfigText(default = 'default location')
 config.plugins.SnmpAgent.measurebitrate = ConfigYesNo(default = False)
@@ -41,7 +46,9 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 	BER_OID = '.1.3.6.1.2.1.1.10000.0'
 	AGC_OID = '.1.3.6.1.2.1.1.10001.0'
 	SNR_OID = '.1.3.6.1.2.1.1.10002.0'
-	HASPICTURE_OID = '.1.3.6.1.2.1.1.10003.0'
+	SNRDB_OID = '.1.3.6.1.2.1.1.10003.0'
+	LOCK_OID = '.1.3.6.1.2.1.1.10004.0'
+	HASPICTURE_OID = '.1.3.6.1.2.1.1.10009.0'
 	CHANNELNAME_OID = '.1.3.6.1.2.1.1.10010.0'
 	SERVICESTRING_OID = '.1.3.6.1.2.1.1.10011.0'
 	FASTSCANSTRING_OID = '.1.3.6.1.2.1.1.10012.0'
@@ -55,6 +62,39 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 	GATEWAY_OID = '.1.3.6.1.2.1.1.10052.0'
 	ENABLE_EMM_OID = '.1.3.6.1.2.1.1.10060.0'
 	EMM_OID = '.1.3.6.1.2.1.1.10061.0'
+	CPU_USER = '.1.3.6.1.4.1.2021.11.50.0'
+	CPU_NICE = '.1.3.6.1.4.1.2021.11.51.0'
+	CPU_SYSTEM = '.1.3.6.1.4.1.2021.11.52.0'
+	CPU_IDLE = '.1.3.6.1.4.1.2021.11.53.0'
+	CPU_WAIT = '.1.3.6.1.4.1.2021.11.54.0'
+	LOAD_AVR1 = '.1.3.6.1.4.1.2021.10.1.3.1'
+	LOAD_AVR5 = '.1.3.6.1.4.1.2021.10.1.3.2'
+	LOAD_AVR15 = '.1.3.6.1.4.1.2021.10.1.3.3'
+	MEM_TOTAL = '.1.3.6.1.4.1.2021.4.5.0'
+	MEM_TOTAL2 = '.1.3.6.1.2.1.25.2.2.0'
+	MEM_USED = '.1.3.6.1.4.1.2021.4.11.0'
+	MEM_FREE = '.1.3.6.1.4.1.2021.4.6.0'
+	MEM_BUFFER = '.1.3.6.1.4.1.2021.4.14.0'
+	MEM_CACHED = '.1.3.6.1.4.1.2021.4.15.0'
+	MEM_SWAPTOTAL = '.1.3.6.1.4.1.2021.4.3.0'
+	MEM_SWAPFREE = '.1.3.6.1.4.1.2021.4.4.0'
+	DISK_MOUNTPOINTS = '.1.3.6.1.4.1.2021.9.1.1'
+	DISK_MOUNTPOINT = '.1.3.6.1.4.1.2021.9.1.2'
+	DISK_DEVICENAME = '.1.3.6.1.4.1.2021.9.1.3'
+	DISK_AVAIL = '.1.3.6.1.4.1.2021.9.1.7'
+	DISK_AVAIL_1 = '.1.3.6.1.4.1.2021.9.1.7.1'
+	DISK_AVAIL_2 = '.1.3.6.1.4.1.2021.9.1.7.2'
+	DISK_AVAIL_3 = '.1.3.6.1.4.1.2021.9.1.7.3'
+	DISK_AVAIL_4 = '.1.3.6.1.4.1.2021.9.1.7.4'
+	DISK_AVAIL_5 = '.1.3.6.1.4.1.2021.9.1.7.5'
+	DISK_AVAIL_6 = '.1.3.6.1.4.1.2021.9.1.7.6'
+	DISK_USED = '.1.3.6.1.4.1.2021.9.1.8'
+	DISK_USED_1 = '.1.3.6.1.4.1.2021.9.1.8.1'
+	DISK_USED_2 = '.1.3.6.1.4.1.2021.9.1.8.2'
+	DISK_USED_3 = '.1.3.6.1.4.1.2021.9.1.8.3'
+	DISK_USED_4 = '.1.3.6.1.4.1.2021.9.1.8.4'
+	DISK_USED_5 = '.1.3.6.1.4.1.2021.9.1.8.5'
+	DISK_USED_6 = '.1.3.6.1.4.1.2021.9.1.8.6'
 
 	def __init__(self, session, oids = {}):
 		self.session = session
@@ -68,6 +108,8 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 			self.BER_OID: self.getValue,
 			self.AGC_OID: self.getValue,
 			self.SNR_OID: self.getValue,
+			self.SNRDB_OID: self.getValue,
+			self.LOCK_OID: self.getValue,
 			self.HASPICTURE_OID: self.getValue,
 			self.VIDEO_BITRATE_OID: self.getValue,
 			self.AUDIO_BITRATE_OID: self.getValue,
@@ -82,6 +124,37 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 			self.GATEWAY_OID: self.getValue,
 			self.ENABLE_EMM_OID: self.getValue,
 			self.EMM_OID: self.getValue,
+			self.CPU_USER: self.getValue,
+			self.CPU_NICE: self.getValue,
+			self.CPU_SYSTEM: self.getValue,
+			self.CPU_IDLE: self.getValue,
+			self.CPU_WAIT: self.getValue,
+			self.LOAD_AVR1: self.getValue,
+			self.LOAD_AVR5: self.getValue,
+			self.LOAD_AVR15: self.getValue,
+			self.MEM_TOTAL: self.getValue,
+			self.MEM_TOTAL2: self.getValue,
+			self.MEM_USED: self.getValue,
+			self.MEM_FREE: self.getValue,
+			self.MEM_BUFFER: self.getValue,
+			self.MEM_CACHED: self.getValue,
+			self.MEM_SWAPTOTAL: self.getValue,
+			self.MEM_SWAPFREE: self.getValue,
+			self.DISK_MOUNTPOINTS: self.getValue,
+			self.DISK_MOUNTPOINT: self.getValue,
+			self.DISK_DEVICENAME: self.getValue,
+			self.DISK_AVAIL_1: self.getValue,
+			self.DISK_AVAIL_2: self.getValue,
+			self.DISK_AVAIL_3: self.getValue,
+			self.DISK_AVAIL_4: self.getValue,
+			self.DISK_AVAIL_5: self.getValue,
+			self.DISK_AVAIL_6: self.getValue,
+			self.DISK_USED_1: self.getValue,
+			self.DISK_USED_2: self.getValue,
+			self.DISK_USED_3: self.getValue,
+			self.DISK_USED_4: self.getValue,
+			self.DISK_USED_5: self.getValue,
+			self.DISK_USED_6: self.getValue,
 		})
 		bisectoidstore.BisectOIDStore.__init__(self, OIDs = oids)
 		self.session.nav.event.append(self.gotServiceEvent)
@@ -134,10 +207,53 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 
 	def getValue(self, oid, storage):
 		oidstring = bisectoidstore.sortableToOID(oid)
+		strOID = str(oidstring)
 		if oidstring == self.SYSTEMDESCRIPTION_OID:
 			return v1.OctetString(str(config.plugins.SnmpAgent.systemdescription.value))
 		elif oidstring == self.SYSUPTIME_OID:
 			return self.getSysUpTime()
+		elif oidstring == self.CPU_USER:
+			return v1.Counter( GetCPUStatForType(CPUStatTypes.user) )
+		elif oidstring == self.CPU_NICE:
+			return v1.Counter( GetCPUStatForType(CPUStatTypes.nice) )
+		elif oidstring == self.CPU_SYSTEM:
+			return v1.Counter( GetCPUStatForType(CPUStatTypes.system) )
+		elif oidstring == self.CPU_IDLE:
+			return v1.Counter( GetCPUStatForType(CPUStatTypes.idle) )
+		elif oidstring == self.CPU_WAIT:
+			return v1.Counter( GetCPUStatForType(CPUStatTypes.iowait) )
+		elif oidstring == self.LOAD_AVR1:
+			return v1.OctetString( GetCPULoadForType(CPULoadTypes.one) )
+		elif oidstring == self.LOAD_AVR5:
+			return v1.OctetString( GetCPULoadForType(CPULoadTypes.five) )
+		elif oidstring == self.LOAD_AVR15:
+			return v1.OctetString( GetCPULoadForType(CPULoadTypes.fifteen) )
+		elif oidstring == self.MEM_TOTAL:
+			return v1.Integer( GetMemoryForType(MemoryTypes.total) )
+		elif oidstring == self.MEM_TOTAL2:
+			return v1.Integer( GetMemoryForType(MemoryTypes.total) )
+		elif oidstring == self.MEM_USED:
+			return v1.Integer( GetMemoryForType(MemoryTypes.used) )
+		elif oidstring == self.MEM_FREE:
+			return v1.Integer( GetMemoryForType(MemoryTypes.free) )
+		elif oidstring == self.MEM_BUFFER:
+			return v1.Integer( GetMemoryForType(MemoryTypes.buffers) )
+		elif oidstring == self.MEM_CACHED:
+			return v1.Integer( GetMemoryForType(MemoryTypes.cached) )
+		elif oidstring == self.MEM_SWAPTOTAL:
+			return v1.Integer( GetMemoryForType(MemoryTypes.swaptotal) )
+		elif oidstring == self.MEM_SWAPFREE:
+			return v1.Integer( GetMemoryForType(MemoryTypes.swapfree) )
+		elif oidstring == self.DISK_MOUNTPOINTS:
+			return v1.Integer( GetDiskInfo(DiskInfoTypes.totalmounts,0) )
+		elif oidstring == self.DISK_MOUNTPOINT:
+			return v1.OctetString( GetDiskInfo(DiskInfoTypes.mountpoint,0) )
+		elif oidstring == self.DISK_DEVICENAME:
+			return v1.OctetString( GetDiskInfo(DiskInfoTypes.filesystem,0) )
+		elif strOID.startswith(str(self.DISK_AVAIL)):
+			return v1.Integer( GetDiskInfo(DiskInfoTypes.avail,int(strOID[len(str(self.DISK_AVAIL))+1:])-1) )
+		elif strOID.startswith(str(self.DISK_USED)):
+			return v1.Integer( GetDiskInfo(DiskInfoTypes.used,int(strOID[len(str(self.DISK_USED))+1:])-1) )
 		elif oidstring == self.SUPPORTADDRESS_OID:
 			return v1.OctetString(str(config.plugins.SnmpAgent.supportaddress.value))
 		elif oidstring == self.SYSTEMNAME_OID:
@@ -147,9 +263,13 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 		elif oidstring == self.BER_OID:
 			return self.getBER()
 		elif oidstring == self.AGC_OID:
-			return self.getACG()
+			return self.getAGC()
 		elif oidstring == self.SNR_OID:
 			return self.getSNR()
+		elif oidstring == self.SNRDB_OID:
+			return self.getSNRDB()
+		elif oidstring == self.LOCK_OID:
+			return self.getLock()
 		elif oidstring == self.HASPICTURE_OID:
 			return self.haspicture
 		elif oidstring == self.VIDEO_BITRATE_OID:
@@ -328,13 +448,25 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 	def getAGC(self):
 		if self.session and self.session.nav and self.session.nav.getCurrentService():
 			feinfo = self.session.nav.getCurrentService().frontendInfo()
-			return feinfo.getFrontendInfo(iFrontendInformation.signalQuality) * 100 / 65536
+			return feinfo.getFrontendInfo(iFrontendInformation.signalPower) * 100 / 65536
 		return 0
 
 	def getSNR(self):
 		if self.session and self.session.nav and self.session.nav.getCurrentService():
 			feinfo = self.session.nav.getCurrentService().frontendInfo()
-			return feinfo.getFrontendInfo(iFrontendInformation.signalPower) * 100 / 65536
+			return feinfo.getFrontendInfo(iFrontendInformation.signalQuality) * 100 / 65536
+		return 0
+
+	def getSNRDB(self):
+		if self.session and self.session.nav and self.session.nav.getCurrentService():
+			feinfo = self.session.nav.getCurrentService().frontendInfo()
+			return v1.OctetString ( str ( int(feinfo.getFrontendInfo(iFrontendInformation.signalQualitydB)) / 100.0) )
+		return 0
+
+	def getLock(self):
+		if self.session and self.session.nav and self.session.nav.getCurrentService():
+			feinfo = self.session.nav.getCurrentService().frontendInfo()
+			return feinfo.getFrontendInfo(iFrontendInformation.lockState)
 		return 0
 
 	def getChannelName(self):
@@ -606,7 +738,7 @@ def autostartEntry(reason, **kwargs):
 def Plugins(**kwargs):
 	return PluginDescriptor(
 		name = "SnmpAgent",
-		description = "SNMP signal status agent",
+		description = "SNMP Agent for Enigma2",
 		where = PluginDescriptor.WHERE_SESSIONSTART,
 		fnc = autostartEntry
 		)
