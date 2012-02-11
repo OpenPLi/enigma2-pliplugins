@@ -10,4 +10,4 @@ install_PYTHON =	\
 	loadavr.py \
 	memory.py \
 	network.py \
-	SNMPAgent.py
+	SNMPAgent.png
