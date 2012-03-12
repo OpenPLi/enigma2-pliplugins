@@ -121,7 +121,8 @@ class ScSelection(Screen):
 		if "s" in self.what:
 			self.softcam.select(self.softcams.value)
 			self.softcam.command('start')
-		self.mbox.close()
+		if self.mbox:
+			self.mbox.close()
 		self.close()
 		self.session.nav.playService(self.oldref)
 		del self.oldref
