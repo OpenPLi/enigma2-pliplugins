@@ -1,0 +1,67 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: enigma2-plugins\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-06 11:52+0100\n"
+"PO-Revision-Date: 2012-03-11 10:14+0100\n"
+"Last-Translator: \n"
+"Language-Team: www.linux-sprejemniki.info\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Slovenian\n"
+"X-Poedit-Country: SLOVENIA\n"
+
+#: plugin.py:9
+msgid "Softcam setup..."
+msgstr "Nastavitve"
+
+#: plugin.py:13
+msgid "Softcam setup"
+msgstr "Nastavitve"
+
+#: plugin.py:13
+msgid "Lets you configure your softcams"
+msgstr "Nastavljanje emulatorjev"
+
+#: Sc.py:63
+msgid "Select Softcam"
+msgstr "Izbor emulatorja"
+
+#: Sc.py:67
+msgid "Select Card Server"
+msgstr "Izbor bralca kartic"
+
+#: Sc.py:69
+msgid "Restart softcam"
+msgstr "Ponovni zagon emulatorja"
+
+#: Sc.py:71
+msgid "Restart cardserver"
+msgstr "Ponovni zagon bralca kartic"
+
+#: Sc.py:72
+msgid "Restart both"
+msgstr "Ponovni zagon obeh"
+
+#: Sc.py:74
+msgid "Cancel"
+msgstr "Izhod"
+
+#: Sc.py:75
+msgid "OK"
+msgstr "Potrditev"
+
+#: Sc.py:91
+msgid "Please wait, restarting softcam and cardserver."
+msgstr "Poteka ponovni zagon emulatorja in bralca kartic..."
+
+#: Sc.py:93
+msgid "Please wait, restarting softcam."
+msgstr "Poteka ponovni zagon emulatorja..."
+
+#: Sc.py:95
+msgid "Please wait, restarting cardserver."
+msgstr "Poteka ponovni zagon bralca kartic..."
+
