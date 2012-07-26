@@ -1,0 +1,72 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: softcam setup Persian Translation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-06 11:52+0100\n"
+"PO-Revision-Date: 2012-07-26 00:28+0330\n"
+"Last-Translator: mehdi <mehdi_ar_yekta@yahoo.com>\n"
+"Language-Team: Persian Professionals <persianpros@yahoo.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Persian\n"
+"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
+
+#: plugin.py:9
+msgid "Softcam setup..."
+msgstr "در حال راه اندازی سافتکم"
+
+#: plugin.py:13
+msgid "Softcam setup"
+msgstr "راه اندازی سافتکم"
+
+#: plugin.py:13
+msgid "Lets you configure your softcams"
+msgstr "بیایید تا سافتکم را پیکربندی کنیم"
+
+#: Sc.py:63
+msgid "Select Softcam"
+msgstr "انتخاب سافتکم "
+
+#: Sc.py:67
+msgid "Select Card Server"
+msgstr "انتخاب سرور کارت "
+
+#: Sc.py:69
+msgid "Restart softcam"
+msgstr "راه اندازی مجدد سافتکم"
+
+#: Sc.py:71
+msgid "Restart cardserver"
+msgstr "راه اندازی مجدد سرور کارت"
+
+#: Sc.py:72
+msgid "Restart both"
+msgstr "راه اندازی مجدد هر دو"
+
+#: Sc.py:74
+msgid "Cancel"
+msgstr "لغو کردن"
+
+#: Sc.py:75
+msgid "OK"
+msgstr "مورد تایید است"
+
+#: Sc.py:91
+msgid "Please wait, restarting softcam and cardserver."
+msgstr "لطفا صبر کنید در حال راه اندازی مجدد سافتکم و سرور کارت"
+
+#: Sc.py:93
+msgid "Please wait, restarting softcam."
+msgstr "لطفا صبر کنید در حال راه اندازی مجدد سافتکم"
+
+#: Sc.py:95
+msgid "Please wait, restarting cardserver."
+msgstr "لطفا صبر کنید در حال راه اندازی مجدد سرور کارت"
+
