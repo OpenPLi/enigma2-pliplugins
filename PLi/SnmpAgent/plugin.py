@@ -57,6 +57,11 @@ config.plugins.SnmpAgent.save()
 config.tv.lastroot = ConfigText()
 
 #------------------------------------------------------------------------------------------
+#VERSION
+versionstr = "2.0.3"
+#------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------
 #GLOBAL
 #------------------------------------------------------------------------------------------
 global_session = None
@@ -67,7 +72,7 @@ global_my_agent = None
 # SNMPAgentMainMenu
 #===============================================================================
 class SNMPAgent_MainMenu(Screen, ConfigListScreen):
-	skin = """<screen name="SNMPAgent_MainMenu" title="AutoTimer Settings" position="center,center" size="565,370">
+	skin = """<screen name="SNMPAgent_MainMenu" title="SNMP Agent Menu" position="center,center" size="565,370">
 		<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
 		<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
 		<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
@@ -154,7 +159,7 @@ class SNMPAgent_MainMenu(Screen, ConfigListScreen):
 			self.close()
 
 	def setCustomTitle(self):
-		self.setTitle(_("Settings for SnmpAgent"))
+		self.setTitle(_("Settings for SnmpAgent V") + versionstr)
 
 
 class ourOIDStore(bisectoidstore.BisectOIDStore):
@@ -181,6 +186,7 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 	SERVICESTRING_OID = '.1.3.6.1.2.1.1.10011.0'
 	FASTSCANSTRING_OID = '.1.3.6.1.2.1.1.10012.0'
 	SERVICEPARAMS_OID = '.1.3.6.1.2.1.1.10013.0'
+	TUNERTYPE_OID = '.1.3.6.1.2.1.1.10014.0'
 	MANAGERIP_OID = '.1.3.6.1.2.1.1.10020.0'
 	ENABLE_BITRATE_OID = '.1.3.6.1.2.1.1.10030.0'
 	VIDEO_BITRATE_OID = '.1.3.6.1.2.1.1.10031.0'
@@ -252,6 +258,7 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 			self.SERVICESTRING_OID: self.getValue,
 			self.FASTSCANSTRING_OID: self.getValue,
 			self.SERVICEPARAMS_OID: self.getValue,
+			self.TUNERTYPE_OID: self.getValue,
 			self.MANAGERIP_OID: self.getValue,
 			self.ENABLE_BITRATE_OID: self.getValue,
 			self.IP_OID: self.getValue,
@@ -510,6 +517,8 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 			return v1.OctetString('')
 		elif oidstring == self.SERVICEPARAMS_OID:
 			return v1.OctetString(self.getServiceParams())
+		elif oidstring == self.TUNERTYPE_OID:
+			return self.getTunerType()
 		elif oidstring == self.MANAGERIP_OID:
 			return v1.OctetString(str(config.plugins.SnmpAgent.managerip.value))
 		elif oidstring == self.ENABLE_BITRATE_OID:
@@ -680,8 +689,20 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 	def getSNRDB(self):
 		if self.session and self.session.nav and self.session.nav.getCurrentService():
 			feinfo = self.session.nav.getCurrentService().frontendInfo()
-			return v1.OctetString (str (int(feinfo.getFrontendInfo(iFrontendInformation.signalQualitydB)) / 100.0))
+			retval = feinfo.getFrontendInfo(iFrontendInformation.signalQualitydB)
+			if retval == 0x12345678:	#cable tuner? does not have SNR
+				return v1.OctetString ( 0.0 )
+			return v1.OctetString (str (int(retval) / 100.0))
 		return 0
+
+	def getTunerType(self):
+		if self.session and self.session.nav and self.session.nav.getCurrentService():
+			feinfo = self.session.nav.getCurrentService().frontendInfo()
+			frontendData = feinfo and feinfo.getAll(True)
+			if frontendData is not None:
+				ttype = frontendData.get("tuner_type", "UNKNOWN")
+				return v1.OctetString ( ttype )
+		return v1.OctetString ( "UNKNOWN" )
 
 	def getLock(self):
 		if self.session and self.session.nav and self.session.nav.getCurrentService():
@@ -716,7 +737,7 @@ class ourOIDStore(bisectoidstore.BisectOIDStore):
 			onid = int(servicedata[5], 16)
 			sid = int(servicedata[3], 16)
 			servicetype = servicedata[2]
-		params = str(orbital_pos) + "," + str(tsid), "," + str(onid) + "," + str(sid) + "," + str(servicetype)
+		params = str(orbital_pos) + "," + str(tsid) + "," + str(onid) + "," + str(sid) + "," + str(servicetype)
 		return params
 
 class Tuner:
