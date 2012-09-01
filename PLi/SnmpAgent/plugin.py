@@ -159,8 +159,8 @@ class SNMPAgent_MainMenu(Screen, ConfigListScreen):
 			self.close()
 
 	def setCustomTitle(self):
-		self.setTitle(_("Settings for SnmpAgent V") + versionstr)
-
+		#TRANSLATORS: SnmpAgent settings window title, the plugin version is printed in {0}
+		self.setTitle( _("Settings for SnmpAgent V{0}").format(versionstr))
 
 class ourOIDStore(bisectoidstore.BisectOIDStore):
 	startTime = time.time()
