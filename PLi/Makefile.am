@@ -1,1 +1,1 @@
-SUBDIRS = SoftcamSetup SnmpAgent
+SUBDIRS = SoftcamSetup
