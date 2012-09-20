@@ -43,4 +43,5 @@ PLi/SoftcamSetup/po/Makefile
 PLi/SnmpAgent/Makefile
 Extensions/Makefile
 Extensions/UShare/Makefile
+Extensions/OpenUitzendingGemist/Makefile
 ])
