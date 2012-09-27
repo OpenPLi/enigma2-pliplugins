@@ -7,6 +7,8 @@ from Components.Pixmap import Pixmap
 from Components.AVSwitch import AVSwitch
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Sources.StaticText import StaticText
+from Components.ConfigList import ConfigListScreen
+from Components.config import config, ConfigSubsection, ConfigBoolean, ConfigSelection, getConfigListEntry
 from enigma import eServiceReference, eTimer, iPlayableService, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_WRAP, RT_VALIGN_TOP, ePicLoad
 from ServiceReference import ServiceReference
 from Screens.InfoBarGenerics import InfoBarNotifications
@@ -19,6 +21,10 @@ from httplib import HTTPException
 from twisted.web import client
 from os import path as os_path, remove as os_remove, mkdir as os_mkdir
 import socket
+
+
+config.plugins.OpenUitzendingGemist = ConfigSubsection()
+config.plugins.OpenUitzendingGemist.showpictures = ConfigBoolean(default = True)
 
 
 def wgetUrl(target):
@@ -176,12 +182,48 @@ class UGMediaPlayer(Screen, InfoBarNotifications):
 			return
 		self.handleLeave()
 
+class OpenUgConfigureScreen(Screen, ConfigListScreen):
+	def __init__(self, session):
+		self.skin = """
+				<screen position="center,center" size="400,100" title="">
+					<widget name="config" position="10,10"   size="e-20,e-10" scrollbarMode="showOnDemand" />
+				</screen>"""
+		self.session = session
+		Screen.__init__(self, session)
+
+		self.list = []
+		ConfigListScreen.__init__(self, self.list, session = self.session)
+
+		self["actions"] = ActionMap(["SetupActions"],
+		{
+			"ok": self.keyGo,
+			"cancel": self.keyCancel,
+		}, -2)
+
+		self["config"].list = self.list
+		self.list.append(getConfigListEntry(_("Show pictures"), config.plugins.OpenUitzendingGemist.showpictures))
+		self["config"].l.setList(self.list)
+		
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setTitle(_("Open Uitzending Gemist options"))
+
+	def keyGo(self):
+		for x in self["config"].list:
+			x[1].save()
+		self.close()
+
+	def keyCancel(self):
+		for x in self["config"].list:
+			x[1].cancel()
+		self.close()
 
 class OpenUgSetupScreen(Screen):
 	def __init__(self, session):
 		self.skin = """
-				<screen position="center,center" size="400,300" title="">
-					<widget name="menu" position="10,10"   size="e-20,150" scrollbarMode="showOnDemand" />
+				<screen position="center,center" size="400,320" title="">
+					<widget name="menu" position="10,10"   size="e-20,180" scrollbarMode="showOnDemand" />
 					<widget name="info" position="10,e-125" size="e-20,150" halign="center" font="Regular;22" />
 				</screen>"""
 		self.session = session
@@ -209,6 +251,7 @@ class OpenUgSetupScreen(Screen):
 		self.mmenu.append((_("UG Search"), 'search'))
 		self.mmenu.append((_("RTL XL A-Z"), 'rtl'))
 		self.mmenu.append((_("RTL XL Gemist"), 'rtlback'))
+		self.mmenu.append((_("Setup"), 'setup'))
 		self["menu"] = MenuList(self.mmenu)
 
 		self.onLayoutFinish.append(self.layoutFinished)
@@ -241,6 +284,8 @@ class OpenUgSetupScreen(Screen):
 				self.session.open(OpenUg, selection[1])
 			elif selection[1] == 'rtlback':
 				self.session.open(DaysBackScreen)
+			elif selection[1] == 'setup':
+				self.session.open(OpenUgConfigureScreen)
 
 	def keyCancel(self):
 		self.removeFiles(self.imagedir)
@@ -405,7 +450,8 @@ class OpenUg(Screen):
 					if (os_path.exists(thumbnailFile) == True):
 						self.fetchFinished(True, picture_id = tmp_icon, failed = False)
 					else:
-						client.downloadPage(x[self.UG_ICON], thumbnailFile).addCallback(self.fetchFinished, tmp_icon).addErrback(self.fetchFailed, tmp_icon)
+						if config.plugins.OpenUitzendingGemist.showpictures.value:
+							client.downloadPage(x[self.UG_ICON], thumbnailFile).addCallback(self.fetchFinished, tmp_icon).addErrback(self.fetchFailed, tmp_icon)
 				pos += 1
 			self["list"].setList(self.tmplist)
 
