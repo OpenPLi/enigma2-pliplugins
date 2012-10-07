@@ -11,7 +11,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubsection, ConfigBoolean, ConfigSelection, getConfigListEntry
 from enigma import eServiceReference, eTimer, iPlayableService, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_WRAP, RT_VALIGN_TOP, ePicLoad
 from ServiceReference import ServiceReference
-from Screens.InfoBarGenerics import InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarNotifications, InfoBarSeek
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.LoadPixmap import LoadPixmap
 from Tools.BoundFunction import boundFunction
@@ -21,6 +21,7 @@ from httplib import HTTPException
 from twisted.web import client
 from os import path as os_path, remove as os_remove, mkdir as os_mkdir
 import socket
+from datetime import date, timedelta
 
 
 config.plugins.OpenUitzendingGemist = ConfigSubsection()
@@ -36,7 +37,7 @@ def wgetUrl(target):
 	}
 	outtxt = Request(target, None, std_headers)
 	try:
-		outtxt = urlopen2(target).read()
+		outtxt = urlopen2(target, timeout = 5).read()
 	except (URLError, HTTPException, socket.error):
 		return ''
 	return outtxt
@@ -61,7 +62,7 @@ class MPanelList(MenuList):
 		self.moveToIndex(self.selection)
 
 
-class UGMediaPlayer(Screen, InfoBarNotifications):
+class UGMediaPlayer(Screen, InfoBarNotifications, InfoBarSeek):
 	STATE_IDLE = 0
 	STATE_PLAYING = 1
 	STATE_PAUSED = 2
@@ -88,17 +89,20 @@ class UGMediaPlayer(Screen, InfoBarNotifications):
 		</widget>
 		</screen>"""
 
-	def __init__(self, session, service):
+	def __init__(self, session, service, mediatype):
 		Screen.__init__(self, session)
 		self.skinName = "MoviePlayer"
 		InfoBarNotifications.__init__(self)
+		if mediatype == 'rtl':
+			InfoBarSeek.__init__(self)
 		self.session = session
 		self.service = service
 		self.screen_timeout = 3000
-		self.nextservice = None
+		self.mediatype = mediatype
 		self.__event_tracker = ServiceEventTracker(screen = self, eventmap =
 			{
 				iPlayableService.evStart: self.__serviceStarted,
+				iPlayableService.evSeekableStatusChanged: self.__seekableStatusChanged,
 				iPlayableService.evEOF: self.__evEOF,
 			})
 		self["actions"] = ActionMap(["OkCancelActions", "InfobarSeekActions", "MediaPlayerActions", "MovieSelectionActions"],
@@ -116,6 +120,15 @@ class UGMediaPlayer(Screen, InfoBarNotifications):
 		self.onPlayStateChanged = [ ]
 		self.play()
 		self.onClose.append(self.__onClose)
+
+	def __seekableStatusChanged(self):
+		if self.mediatype != 'rtl':
+			return
+		if not self.isSeekable():
+			self["SeekActions"].setEnabled(False)
+			self.setSeekState(self.STATE_PLAYING)
+		else:
+			self["SeekActions"].setEnabled(True)
 
 	def __onClose(self):
 		self.session.nav.stopService()
@@ -168,6 +181,7 @@ class UGMediaPlayer(Screen, InfoBarNotifications):
 
 	def __serviceStarted(self):
 		self.state = self.STATE_PLAYING
+		self.__seekableStatusChanged()
 
 	def handleLeave(self):
 		self.close()
@@ -320,8 +334,14 @@ class DaysBackScreen(Screen):
 
 		self.mmenu= []
 		count = 0
+		now = date.today()
 		while count < 15:
-			self.mmenu.append(((_("%d days back") % count), count))
+			if count == 0:
+				self.mmenu.append((_("Today"), count))
+			else:
+				tmp = now.strftime("%A")
+				self.mmenu.append(((tmp), count))
+			now = now - timedelta(1)
 			count += 1
 		self["menu"] = MenuList(self.mmenu)
 
@@ -569,10 +589,7 @@ class OpenUg(Screen):
 
 	def finish_decode(self, picture_id, info):
 		ptr = self.picloads[picture_id].getData()
-		if self.isRtl:
-			thumbnailFile = self.imagedir + str(picture_id)
-		else:
-			thumbnailFile = self.imagedir + str(picture_id)
+		thumbnailFile = self.imagedir + str(picture_id)
 		if ptr != None:
 			if self.Details.has_key(picture_id):
 				self.Details[picture_id]["thumbnail"] = ptr
@@ -580,7 +597,11 @@ class OpenUg(Screen):
 		self.tmplist = []
 		pos = 0
 		for x in self.mediaList:
-			self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png =  self.Details[(x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE]))]["thumbnail"]))
+			if self.Details[(x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE]))]["thumbnail"] is not None:
+				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.Details[(x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE]))]["thumbnail"]))
+			else:
+				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.png))
+
 			pos += 1
 		self["list"].setList(self.tmplist)
 
@@ -601,7 +622,7 @@ class OpenUg(Screen):
 				if tmp != '':
 					myreference = eServiceReference(4097, 0, tmp)
 					myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
-					self.session.open(UGMediaPlayer, myreference)
+					self.session.open(UGMediaPlayer, myreference, 'rtl')
 
 		else:
 			if self.level == self.UG_LEVEL_ALL:
@@ -624,7 +645,7 @@ class OpenUg(Screen):
 		tmp = tmp[0].replace('\/', '/')
 		myreference = eServiceReference(4097, 0, tmp)
 		myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
-		self.session.open(UGMediaPlayer, myreference)
+		self.session.open(UGMediaPlayer, myreference, 'npo')
 
 	def getRTLStream(self, url):
 		data = wgetUrl(self.RTL_BASE_URL + url)
@@ -717,7 +738,14 @@ class OpenUg(Screen):
 				if tmp in line:
 					name = line.split(tmp)[1].split("</span>")[0]
 					icon_type = self.getIconType(icon)
-					weekList.append((date, name, short, channel, stream, icon, icon_type, True))
+
+					ignore = False
+					for x in weekList:
+						if stream == x[self.UG_STREAMURL] and icon == x[self.UG_ICON]:
+							ignore = True
+							break
+					if ignore is False:
+						weekList.append((date, name, short, channel, stream, icon, icon_type, True))
 					state = 0
 
 	def getRTLMediaDataBack(self, weekList, days):
