@@ -13,6 +13,7 @@ from enigma import eServiceReference, eTimer, iPlayableService, eListboxPythonMu
 from ServiceReference import ServiceReference
 from Screens.InfoBarGenerics import InfoBarNotifications, InfoBarSeek
 from Screens.VirtualKeyBoard import VirtualKeyBoard
+from Screens.MessageBox import MessageBox
 from Tools.LoadPixmap import LoadPixmap
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
@@ -196,6 +197,12 @@ class UGMediaPlayer(Screen, InfoBarNotifications, InfoBarSeek):
 			return
 		self.handleLeave()
 
+	def lockShow(self):
+		return
+
+	def unlockShow(self):
+		return
+
 class OpenUgConfigureScreen(Screen, ConfigListScreen):
 	def __init__(self, session):
 		self.skin = """
@@ -372,6 +379,9 @@ class OpenUg(Screen):
 	UG_LEVEL_SERIE = 1
 	MAX_PIC_PAGE = 5
 
+	TIMER_CMD_START = 0
+	TIMER_CMD_VKEY = 1
+
 	UG_BASE_URL = "http://hbbtv.distributie.publiekeomroep.nl"
 	HBBTV_UG_BASE_URL = UG_BASE_URL + "/ug/ajax/action/"
 	STAGING_UG_BASE_URL = "http://staging.hbbtv.distributie.publiekeomroep.nl/"
@@ -403,6 +413,8 @@ class OpenUg(Screen):
 		self.isRtl = False
 		self.isRtlBack = False
 		self.level = self.UG_LEVEL_ALL
+		self.cmd = cmd
+		self.timerCmd = self.TIMER_CMD_START
 
 		self.png = LoadPixmap(resolveFilename(SCOPE_PLUGINS, "Extensions/OpenUitzendingGemist/pli.png"))
 		
@@ -426,8 +438,7 @@ class OpenUg(Screen):
 		}
 		, -1)
 		self.onLayoutFinish.append(self.layoutFinished)
-
-		self.setupCallback(cmd)
+		self.cbTimer.start(10)
 
 	def layoutFinished(self):
 		self.setTitle("Open Uitzending Gemist")
@@ -511,11 +522,15 @@ class OpenUg(Screen):
 			self.clearList()
 			self.level = self.UG_LEVEL_SERIE
 			self.getMediaData(self.mediaList, self.HBBTV_UG_BASE_URL + "archive_week/protocol/html")
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
 			self.updateMenu()
 		elif retval == 'pop':
 			self.clearList()
 			self.level = self.UG_LEVEL_SERIE
 			self.getMediaData(self.mediaList, self.STAGING_UG_BASE_URL + "ug/ajax/action/popular/protocol/html")
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
 			self.updateMenu()
 		elif retval == 'atotz':
 			self.clearList()
@@ -525,26 +540,38 @@ class OpenUg(Screen):
 			self.getMediaDataAlph(self.mediaList, self.HBBTV_UG_BASE_URL + "a2z/a2zActiveIndex/1/protocol/html")
 			self.getMediaDataAlph(self.mediaList, self.HBBTV_UG_BASE_URL + "a2z/a2zActiveIndex/2/protocol/html")
 			self.getMediaDataAlph(self.mediaList, self.HBBTV_UG_BASE_URL + "a2z/a2zActiveIndex/3/protocol/html")
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
 			self.updateMenu()
 		elif retval == 'search':
+			self.timerCmd = self.TIMER_CMD_VKEY
 			self.cbTimer.start(10)
 		elif retval == 'rtl':
 			self.clearList()
 			self.isRtl = True
 			self.level = self.UG_LEVEL_ALL
 			self.getRTLMediaData(self.mediaList)
-			self.updateMenu()
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
 		else:
 			self.clearList()
 			self.isRtl = True
 			self.isRtlBack = True
 			self.level = self.UG_LEVEL_SERIE
 			self.getRTLMediaDataBack(self.mediaList, retval)
-			self.updateMenu()
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
 
 	def timerCallback(self):
 		self.cbTimer.stop()
-		self.session.openWithCallback(self.keyboardCallback, VirtualKeyBoard, title = (_("Search term")), text = "")
+		if self.timerCmd == self.TIMER_CMD_START:
+			self.setupCallback(self.cmd)
+		elif self.timerCmd == self.TIMER_CMD_VKEY:
+			self.session.openWithCallback(self.keyboardCallback, VirtualKeyBoard, title = (_("Search term")), text = "")
 
 	def keyboardCallback(self, callback = None):
 		if callback is not None and len(callback):
@@ -553,8 +580,13 @@ class OpenUg(Screen):
 			self.level = self.UG_LEVEL_SERIE
 			self.getMediaData(self.mediaList, self.STAGING_UG_BASE_URL + "ug/ajax/action/search/protocol/html/searchString/" + callback)
 			self.updateMenu()
+			if len(self.mediaList) == 0:
+				self.session.openWithCallback(self.close, MessageBox, _("No items matching your search criteria were found"), MessageBox.TYPE_ERROR, timeout=5, simple = True)
 		else:
 			self.close()
+
+	def mediaProblemPopup(self):
+		self.session.openWithCallback(self.close, MessageBox, _("There was a problem retrieving the media list"), MessageBox.TYPE_ERROR, timeout=5, simple = True)
 
 	def fetchFailed(self, string, picture_id):
 		self.fetchFinished(False, picture_id, failed = True)
@@ -684,7 +716,7 @@ class OpenUg(Screen):
 
 				tmp = "<img class=\"thumbnail\" src=\""
 				if tmp in line:
-					icon = 'http://rtl.ksya.net/' + line.split(tmp)[1].split('\" ')[0]
+					icon = line.split(tmp)[1].split('\" ')[0]
 
 				tmp = "<span class=\"title\">"
 				if tmp in line:
