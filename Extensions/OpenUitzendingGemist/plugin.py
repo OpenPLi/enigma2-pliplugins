@@ -724,6 +724,8 @@ class OpenUg(Screen):
 					state = 2
 
 			elif state == 2:
+				if '<span class=\"extra_info\">' in line:
+					continue
 				tmp = "<br />"
 				short = line.split(tmp)[0].lstrip()
 				state = 3
@@ -761,10 +763,6 @@ class OpenUg(Screen):
 				tmp = "<a href=\""
 				if tmp in line:
 					stream = line.split(tmp)[1].split('\">')[0]
-
-				tmp = "<img class=\"thumbnail\" src=\""
-				if tmp in line:
-					icon = self.RTL_BASE_URL + line.split(tmp)[1].split('\" ')[0]
 
 				tmp = "<span class=\"title\">"
 				if tmp in line:
