@@ -346,8 +346,7 @@ class DaysBackScreen(Screen):
 			if count == 0:
 				self.mmenu.append((_("Today"), count))
 			else:
-				tmp = now.strftime("%A")
-				self.mmenu.append(((tmp), count))
+				self.mmenu.append(((now.strftime("%A")), count))
 			now = now - timedelta(1)
 			count += 1
 		self["menu"] = MenuList(self.mmenu)
@@ -672,10 +671,7 @@ class OpenUg(Screen):
 
 	def doUGPlay(self):
 		out = wgetUrl(self.STAGING_UG_BASE_URL + "streams/video/pr_id/" + self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL])
-		tmp = out.split('stream_link":"')
-		tmp = tmp[1].split('\",')
-		tmp = tmp[0].replace('\/', '/')
-		myreference = eServiceReference(4097, 0, tmp)
+		myreference = eServiceReference(4097, 0, out.split('stream_link":"')[1].split('\",')[0].replace('\/', '/'))
 		myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
 		self.session.open(UGMediaPlayer, myreference, 'npo')
 
@@ -687,8 +683,7 @@ class OpenUg(Screen):
 		name = ''
 		icon = ''
 		for line in data:
-			tmp = ".mp4"
-			if tmp in line:
+			if ".mp4" in line:
 				tmp = "<a href=\""
 				if tmp in line:
 					url = line.split(tmp)[1].split("\">")[0]
@@ -726,18 +721,15 @@ class OpenUg(Screen):
 			elif state == 2:
 				if '<span class=\"extra_info\">' in line:
 					continue
-				tmp = "<br />"
-				short = line.split(tmp)[0].lstrip()
+				short = line.split("<br />")[0].lstrip()
 				state = 3
 
 			elif state == 3:
-				tmp = "<br />"
-				channel = line.split(tmp)[0].lstrip()
+				channel = line.split("<br />")[0].lstrip()
 				state = 4
 
 			elif state == 4:
-				tmp = "<br />"
-				date = line.split(tmp)[0].lstrip()
+				date = line.split("<br />")[0].lstrip()
 
 				icon_type = self.getIconType(icon)
 				weekList.append((date, name, short, channel, stream, icon, icon_type, False))
@@ -756,8 +748,7 @@ class OpenUg(Screen):
 		channel = ''
 		for line in data:
 			if state == 0:
-				tmp = "<li>"
-				if tmp in line:
+				if "<li>" in line:
 					state = 1
 			elif state == 1:
 				tmp = "<a href=\""
@@ -790,14 +781,11 @@ class OpenUg(Screen):
 		date = ''
 		channel = ''
 		for line in data:
-			tmp = "<li>"
-			if tmp in line:
+			if "<li>" in line:
 				state = 1
 			if state == 1:
-				tmp = "<a href=\"episode"
-				if tmp in line:
-					tmp = "<a href=\""
-					stream = line.split(tmp)[1].split('\">')[0]
+				if "<a href=\"episode" in line:
+					stream = line.split("<a href=\"")[1].split('\">')[0]
 
 				tmp = "<img class=\"thumbnail\" src=\""
 				if tmp in line:
@@ -845,29 +833,24 @@ class OpenUg(Screen):
 			elif state == 1:
 				tmp = "<div class=\"programDetails\" id=\""
 				if  tmp in line:
-					tmp = line.split(tmp)
-					stream = tmp[1].split('\">')[0]
+					stream = line.split(tmp)[1].split('\">')[0]
 
 				tmp = "<h3>"
 				if tmp in line:
-					tmp = line.split(tmp)
-					name = tmp[1].split("</h3>")[0]
+					name = line.split(tmp)[1].split("</h3>")[0]
 
 				tmp = "<div class='short'>"
 				if tmp in line:
-					tmp = line.split(tmp)
-					short = tmp[1].split("</div>")[0]
+					short = line.split(tmp)[1].split("</div>")[0]
 
 				tmp = "<div class='datum'>"
 				if tmp in line and date == '':
-					tmp = line.split(tmp)
-					date = tmp[1].split("</div>")[0]
+					date = line.split(tmp)[1].split("</div>")[0]
 					channel = date[-3:]
 
 				tmp = "<img class='thumbnail' src='"
 				if tmp in line:
-					tmp = line.split(tmp)
-					icon = tmp[1].split("\'/>")[0]
+					icon = line.split(tmp)[1].split("\'/>")[0]
 					if "http://" not in icon:
 						icon_tmp = self.UG_BASE_URL
 						icon =  icon_tmp + icon
@@ -889,8 +872,7 @@ class OpenUg(Screen):
 		serieid = ''
 		data = data.split('\n')
 		for line in data:
-			tmp = "<div class=\"menuItem"
-			if tmp in line:
+			if "<div class=\"menuItem" in line:
 				serieid = ''
 				short = ''
 				name = ''
@@ -898,49 +880,39 @@ class OpenUg(Screen):
 				stream = ''
 				channel = ''
 				icon = ''
-				tmp = "id="
-				if tmp in line:
-					tmp = line.split("id=\"")
-					serieid = tmp[1].split('\"')[0]
+				if "id=" in line:
+					serieid = line.split("id=\"")[1].split('\"')[0]
 				state = 1
 
 			if state == 1:
 				tmp = "<h3>"
 				if tmp in line and name == '':
-					tmp = line.split(tmp)
-					name = tmp[1].split("</h3>")[0]
+					name = line.split(tmp)[1].split("</h3>")[0]
 
 				tmp = "<div class=\"programDetails\" id=\""
 				if tmp in line and stream == '':
-					tmp = line.split(tmp)
-					stream = tmp[1].split("\"")[0]
+					stream = line.split(tmp)[1].split("\"")[0]
 
 				if serieid == '':
 					tmp = "<img class='thumbnail' src='"
 					if tmp in line:
-						tmp = line.split(tmp)
-						icon = tmp[1].split('\'/>')[0]
-						tmp = "http://"
-						if tmp not in icon:
+						icon = line.split(tmp)[1].split('\'/>')[0]
+						if "http://" not in icon:
 							icon_tmp = self.UG_BASE_URL
 							icon =  icon_tmp + icon
 
 					tmp = "<div class='datum'>"
 					if tmp in line and date == '':
-						tmp = line.split(tmp)
-						date = tmp[1].split("</div>")[0]
+						date = line.split(tmp)[1].split("</div>")[0]
 						channel = date[-3:]
 
 					tmp = "<div class='short'>"
 					if tmp in line:
-						tmp = line.split(tmp)
-						short = tmp[1].split("</div>")[0]
+						short = line.split(tmp)[1].split("</div>")[0]
 				else:
 					tmp = "<div class='thumbHolder'>"
 					if tmp in line:
-						tmp = "url(\""
-						tmp = line.split(tmp)
-						icon = tmp[1].split("\"")[0]
+						icon = line.split("url(\"")[1].split("\"")[0]
 						if "http://" not in icon:
 							icon_tmp = self.UG_BASE_URL
 							icon =  icon_tmp + icon
