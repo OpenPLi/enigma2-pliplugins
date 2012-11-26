@@ -684,9 +684,9 @@ class OpenUg(Screen):
 		icon = ''
 		for line in data:
 			if ".mp4" in line:
-				tmp = "<a href=\""
+				tmp = "<source src=\""
 				if tmp in line:
-					url = line.split(tmp)[1].split("\">")[0]
+					url = line.split("src=\"")[1].split("\"")[0]
 				return url
 		return ''
 
@@ -704,7 +704,7 @@ class OpenUg(Screen):
 			if "<li>" in line:
 				state = 1
 			if state == 1:
-				tmp = "<a href=\"episode"
+				tmp = "<a href=\"video"
 				if tmp in line:
 					tmp = "<a href=\""
 					stream = line.split(tmp)[1].split('\">')[0]
@@ -784,8 +784,8 @@ class OpenUg(Screen):
 			if "<li>" in line:
 				state = 1
 			if state == 1:
-				if "<a href=\"episode" in line:
-					stream = line.split("<a href=\"")[1].split('\">')[0]
+				if "<a href=\"video" in line:
+					stream = line.split("<a href=\"")[1].split('\" ')[0]
 
 				tmp = "<img class=\"thumbnail\" src=\""
 				if tmp in line:
@@ -797,15 +797,19 @@ class OpenUg(Screen):
 					state = 2
 
 			elif state == 2:
-				short = line.split("<br />")[0].lstrip()
 				state = 3
 
 			elif state == 3:
-				channel = line.split("<br />")[0].lstrip()
+				tmp = line.split("<br")[0].split(" | ")
+				channel = tmp[0]
+				if len(tmp) > 1:
+					short = tmp[1]
+					if len(tmp) > 2:
+						short = short + " " + tmp[2]
 				state = 4
 
 			elif state == 4:
-				date = ''
+				date = line
 				icon_type = self.getIconType(icon)
 				weekList.append((date, name, short, channel, stream, icon, icon_type, False))
 				state = 0
