@@ -463,13 +463,21 @@ class OpenUg(Screen):
 		self["list"].pageDown()
 		self.updatePage()
 
+	def getThumbnailName(self, x):
+		if self.isRtl:
+			if x[self.UG_ICON]:
+				return str(x[self.UG_ICON]).split("/uuid=")[1].split("/")[0] + ".jpg"
+			else:
+				return ""
+		return str(x[self.UG_STREAMURL]) + str(x[self.UG_ICONTYPE])
+
 	def updateMenu(self):
 		self.tmplist = []
 		if len(self.mediaList) > 0:
 			pos = 0
 			for x in self.mediaList:
 				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.png))
-				tmp_icon = str(x[self.UG_STREAMURL]) + str(x[self.UG_ICONTYPE])
+				tmp_icon = self.getThumbnailName(x)
 				thumbnailFile = self.imagedir + tmp_icon
 				self.pixmaps_to_load.append(tmp_icon)
 
@@ -602,7 +610,7 @@ class OpenUg(Screen):
 			count = 0
 			for x in self.mediaList:
 				if count >= start and count < end:
-					if (x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE])) == picture_id:
+					if self.getThumbnailName(x) == picture_id:
 						self.picloads[picture_id] = ePicLoad()
 						self.picloads[picture_id].PictureData.get().append(boundFunction(self.finish_decode, picture_id))
 						self.picloads[picture_id].setPara((150, 150, sc[0], sc[1], False, 1, "#00000000"))
@@ -628,8 +636,8 @@ class OpenUg(Screen):
 		self.tmplist = []
 		pos = 0
 		for x in self.mediaList:
-			if self.Details[(x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE]))]["thumbnail"] is not None:
-				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.Details[(x[self.UG_STREAMURL] + str(x[self.UG_ICONTYPE]))]["thumbnail"]))
+			if self.Details[self.getThumbnailName(x)]["thumbnail"] is not None:
+				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.Details[self.getThumbnailName(x)]["thumbnail"]))
 			else:
 				self.tmplist.append(MPanelEntryComponent(channel = x[self.UG_CHANNELNAME], text = (x[self.UG_PROGNAME] + '\n' + x[self.UG_PROGDATE] + '\n' + x[self.UG_SHORT_DESCR]), png = self.png))
 
