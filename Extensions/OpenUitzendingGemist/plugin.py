@@ -670,7 +670,7 @@ class OpenUg(Screen):
 					self.clearList()
 					self.isRtl = False
 					self.level = self.UG_LEVEL_SERIE
-					self.getMediaData(self.mediaList, self.STAGING_UG_BASE_URL + "ug/ajax/action/a2z-serie/a2zSerieId/" + tmp)
+					self.getMediaData(self.mediaList, self.HBBTV_UG_BASE_URL + "a2z-serie/a2zSerieId/" + tmp)
 					self.updateMenu()
 				else:
 					self.doUGPlay()
