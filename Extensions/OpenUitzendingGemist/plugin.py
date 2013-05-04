@@ -729,16 +729,13 @@ class OpenUg(Screen):
 			elif state == 2:
 				if '<span class=\"extra_info\">' in line:
 					continue
-				short = line.split("<br />")[0].lstrip()
+				date = line.split("<br />")[0].lstrip()
 				state = 3
 
 			elif state == 3:
-				channel = line.split("<br />")[0].lstrip()
-				state = 4
-
-			elif state == 4:
-				date = line.split("<br />")[0].lstrip()
-
+				tmp = "<span class=\"small\">"
+				if tmp in line:
+					short = line.split(tmp)[1].split('</span>')[0]
 				icon_type = self.getIconType(icon)
 				weekList.append((date, name, short, channel, stream, icon, icon_type, False))
 				state = 0
@@ -960,4 +957,6 @@ def main(session, **kwargs):
 	session.open(OpenUgSetupScreen)
 
 def Plugins(**kwargs):
-	return [PluginDescriptor(name = "Open uitzending gemist", description = _("Watch uitzending gemist"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main)]
+
+	return [PluginDescriptor(name = "Open uitzending gemist", description = _("Watch uitzending gemist"), where = PluginDescriptor.WHERE_PLUGINMENU, icon="pli.png", fnc = main),
+			PluginDescriptor(name = "Open uitzending gemist", description = _("Watch uitzending gemist"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main)]
