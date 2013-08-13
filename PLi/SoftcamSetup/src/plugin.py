@@ -1,5 +1,9 @@
 from . import _
 from Plugins.Plugin import PluginDescriptor
+from Components.config import config, ConfigSubsection, ConfigYesNo
+
+config.misc.softcam_setup = ConfigSubsection()
+config.misc.softcam_setup.extension_menu = ConfigYesNo(default = True)
 
 def main(session, **kwargs):
 	import Sc
@@ -11,4 +15,7 @@ def menu(menuid, **kwargs):
 	return []
 
 def Plugins(**kwargs):
-	return PluginDescriptor(name = "Softcam setup", description = "Lets you configure your softcams", where = PluginDescriptor.WHERE_MENU, fnc = menu)
+	list = [(PluginDescriptor(name="Softcam setup", description="Lets you configure your softcams", where = PluginDescriptor.WHERE_MENU, fnc = menu))]
+	if config.misc.softcam_setup.extension_menu.value:
+		list.append(PluginDescriptor(name="Softcam setup", description="Lets you configure your softcams", where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main))
+	return list

@@ -21,17 +21,19 @@ class ConfigAction(ConfigElement):
 		self.actionargs = args 
 	def handleKey(self, key):
 		if (key == KEY_OK):
-			self.action(*self.actionargs) 
+			self.action(*self.actionargs)
+	def getMulti(self, dummy):
+		pass
 
 class ScSelection(Screen):
 	skin = """
-        <screen name="ScSelection" position="center,center" size="560,230" title="Softcam Setup">
-                <widget name="entries" position="5,10" size="550,140" />
-                <ePixmap name="red" position="0,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
-                <ePixmap name="green" position="140,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
-                <widget name="key_red" position="0,190" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
-                <widget name="key_green" position="140,190" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
-        </screen>"""
+	<screen name="ScSelection" position="center,center" size="560,230" title="Softcam Setup">
+		<widget name="entries" position="5,10" size="550,140" />
+		<ePixmap name="red" position="0,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
+		<Pixmap name="green" position="140,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
+		<widget name="key_red" position="0,190" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
+		<widget name="key_green" position="140,190" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
+	</screen>"""
 	def __init__(self, session):
 		Screen.__init__(self, session)
 
@@ -70,7 +72,9 @@ class ScSelection(Screen):
 		self.list.append(getConfigListEntry(_("Restart softcam"), ConfigAction(self.restart, "s")))
 		if cardservers: 
 			self.list.append(getConfigListEntry(_("Restart cardserver"), ConfigAction(self.restart, "c"))) 
-			self.list.append(getConfigListEntry(_("Restart both"), ConfigAction(self.restart, "sc"))) 
+			self.list.append(getConfigListEntry(_("Restart both"), ConfigAction(self.restart, "sc")))
+
+		self.list.append(getConfigListEntry(_("Show softcam setup in extensions menu"), config.misc.softcam_setup.extension_menu))
 
 		self["key_red"] = Label(_("Cancel"))
 		self["key_green"] = Label(_("OK"))
@@ -83,7 +87,6 @@ class ScSelection(Screen):
 		
 	def ok(self):
 		self["entries"].handleKey(KEY_OK)
-	
 
 	def restart(self, what):
 		self.what = what
@@ -92,7 +95,7 @@ class ScSelection(Screen):
 				msg = _("Please wait, restarting softcam and cardserver.")
 			else:
 				msg  = _("Please wait, restarting softcam.")
-                elif "c" in what:
+		elif "c" in what:
 			msg = _("Please wait, restarting cardserver.")
 		self.mbox = self.session.open(MessageBox, msg, MessageBox.TYPE_INFO)
 		self.activityTimer = eTimer()
@@ -116,7 +119,7 @@ class ScSelection(Screen):
 		self.activityTimer.stop()
 		del self.activityTimer 
 		if "c" in self.what:
-                        self.cardserver.select(self.cardservers.value)
+			self.cardserver.select(self.cardservers.value)
 			self.cardserver.command('start')
 		if "s" in self.what:
 			self.softcam.select(self.softcams.value)
@@ -137,12 +140,15 @@ class ScSelection(Screen):
 	def save(self):
 		what = ''
 		if hasattr(self, 'cardservers') and (self.cardservers.value != self.cardserver.current()):
-                        what = 'sc'
+			what = 'sc'
 		elif self.softcams.value != self.softcam.current():
-                        what = 's'
-                if what:
-                	self.restart(what)
+			what = 's'
+		if what:
+			self.restart(what)
 		else:
+			from Components.PluginComponent import plugins
+			plugins.reloadPlugins()
+			config.misc.softcam_setup.extension_menu.save()
 			self.close()
 
 	def cancel(self):
