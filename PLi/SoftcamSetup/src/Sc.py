@@ -27,7 +27,7 @@ class ConfigAction(ConfigElement):
 
 class ScSelection(Screen):
 	skin = """
-	<screen name="ScSelection" position="center,center" size="560,230" title="Softcam Setup">
+	<screen name="ScSelection" position="center,center" size="560,230" >
 		<widget name="entries" position="5,10" size="550,140" />
 		<ePixmap name="red" position="0,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
 		<Pixmap name="green" position="140,190" zPosition="1" size="140,40" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
@@ -36,6 +36,8 @@ class ScSelection(Screen):
 	</screen>"""
 	def __init__(self, session):
 		Screen.__init__(self, session)
+
+		self.setup_title = _("Softcam setup")
 
 		self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "CiSelectionActions"],
 			{
@@ -78,6 +80,11 @@ class ScSelection(Screen):
 
 		self["key_red"] = Label(_("Cancel"))
 		self["key_green"] = Label(_("OK"))
+
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setTitle(self.setup_title)
 
 	def keyLeft(self):
 		self["entries"].handleKey(KEY_LEFT)
