@@ -15,7 +15,9 @@ def menu(menuid, **kwargs):
 	return []
 
 def Plugins(**kwargs):
-	list = [(PluginDescriptor(name="Softcam setup", description="Lets you configure your softcams", where = PluginDescriptor.WHERE_MENU, fnc = menu))]
+	name = _("Softcam setup")
+	description = _("Lets you configure your softcams")
+	list = [(PluginDescriptor(name=name, description=description, where = PluginDescriptor.WHERE_MENU, fnc = menu))]
 	if config.misc.softcam_setup.extension_menu.value:
-		list.append(PluginDescriptor(name="Softcam setup", description="Lets you configure your softcams", where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main))
+		list.append(PluginDescriptor(name=name, description=description, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main))
 	return list
