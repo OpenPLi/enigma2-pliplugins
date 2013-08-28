@@ -1,15 +1,10 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: enigma2-plugins\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-06 11:52+0100\n"
-"PO-Revision-Date: 2012-03-08 06:42+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2013-08-28 13:46+0100\n"
+"Last-Translator: Biki3 <dobritt@gmx.de>\n"
 "Language-Team: daddelfalk\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -20,55 +15,133 @@ msgstr ""
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: iso-8859-15\n"
 
-#: plugin.py:9
-msgid "Softcam setup..."
-msgstr "Softcam Konfiguration..."
-
-#: plugin.py:13
-msgid "Softcam setup"
-msgstr "Softcam Konfiguration"
-
-#: plugin.py:13
-msgid "Lets you configure your softcams"
-msgstr "Konfigurieren von Softcams und Karten-Server"
-
-#: Sc.py:63
-msgid "Select Softcam"
-msgstr "Softcam auswählen"
-
-#: Sc.py:67
-msgid "Select Card Server"
-msgstr "Karten-Server auswählen"
-
-#: Sc.py:69
-msgid "Restart softcam"
-msgstr "Neustart Softcam"
-
-#: Sc.py:71
-msgid "Restart cardserver"
-msgstr "Neustart Karten-Server"
-
-#: Sc.py:72
-msgid "Restart both"
-msgstr "Neustart beide"
-
-#: Sc.py:74
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: Sc.py:75
+msgid "Lets you configure your softcams"
+msgstr "Konfiguration der Softcams und Karten-Server"
+
 msgid "OK"
 msgstr "OK"
 
-#: Sc.py:91
-msgid "Please wait, restarting softcam and cardserver."
-msgstr "Bitte warten, starte Softcam und Karten-Server neu."
-
-#: Sc.py:93
-msgid "Please wait, restarting softcam."
-msgstr "Bitte warten, starte Softcam neu."
-
-#: Sc.py:95
 msgid "Please wait, restarting cardserver."
-msgstr "Bitte warten, starte Karten-Server neu."
+msgstr "Bitte warten, Karten-Server startet neu."
+
+msgid "Please wait, restarting softcam and cardserver."
+msgstr "Bitte warten, Softcam und Karten-Server starten neu."
+
+msgid "Please wait, restarting softcam."
+msgstr "Bitte warten, Softcam startet neu."
+
+msgid "Restart both"
+msgstr "Neustart Beide"
+
+msgid "restart both"
+msgstr "Neustart Beide"
+
+msgid "Restart cardserver"
+msgstr "Neustart Karten-Server"
+
+msgid "restart cardserver"
+msgstr "Neustart Karten-Server"
+
+msgid "Restart softcam"
+msgstr "Neustart Softcam"
+
+msgid "restart softcam"
+msgstr "Neustart Softcam"
+
+msgid "Select Card Server"
+msgstr "Wähle Karten-Server"
+
+msgid "Select Softcam"
+msgstr "Wähle Softcam"
+
+msgid "Softcam setup"
+msgstr "Softcam Konfiguration"
+
+msgid "Softcam setup..."
+msgstr "Softcam Konfiguration..."
+
+msgid "Enable Auto-Camd"
+msgstr "Aktiviere Auto-Camd"
+
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+msgid "Don't switch auto-camd while recording"
+msgstr "Auto-Camd während Aufnahme nicht wechseln"
+
+msgid "Setup Auto-Camd List"
+msgstr "Einstellung Auto-Camd Liste"
+
+msgid "Default Camd"
+msgstr "Camd voreingestellt"
+
+msgid "Current softcam: "
+msgstr "Aktuelles Softcam"
+
+msgid "Current cardserver: "
+msgstr "Aktueller Karten-Server"
+
+msgid "Settings menu"
+msgstr "Einstellungs-Menü"
+
+msgid "Show plugin extensions menu"
+msgstr "Zeige Plugin in Erweiterungen"
+
+msgid "Quick button"
+msgstr "Schnell-Button"
+
+msgid "Choice key"
+msgstr "Schnell-Button Taste bestimmen"
+
+msgid "Open plugin - cursor to restart:"
+msgstr "Plugin geöffnet - Curser für Neustart"
+
+msgid "Show ecm.info"
+msgstr "Zeige ECM Informationen"
+
+msgid "Close plugin on restart emu"
+msgstr "Bei EMU Neustart Plugin schliessen"
+
+msgid "Changing keymap failed (%s)."
+msgstr "Keymap Wechsel gescheitert (%s) !"
+
+msgid "Softcam Setup"
+msgstr "Softcam Konfiguration"
+
+msgid "Add Provider"
+msgstr "Provider hinzufügen"
+
+msgid "Add Channel"
+msgstr "Kanal hinzufügen"
+
+msgid "Auto-Camd List Setup"
+msgstr "Einstellung Auto-Camd Liste"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Change Camd"
+msgstr "Camd wechseln"
+
+msgid ""
+"Switch camd:\n"
+" '%s' to '%s'"
+msgstr ""
+"Wechsle Camd:\n"
+" '%s' to '%s'"
+
+msgid "Help key"
+msgstr "Taste Help"
+
+msgid "TEXT key"
+msgstr "Taste TEXT"
+
+msgid "RED key"
+msgstr "Taste Rot"
+
+msgid "YELLOW key"
+msgstr "Taste Gelb"
 
