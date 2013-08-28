@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2-plugins\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-06 11:52+0100\n"
-"PO-Revision-Date: 2013-08-28 13:46+0100\n"
+"PO-Revision-Date: 2013-08-28 16:02+0100\n"
 "Last-Translator: Biki3 <dobritt@gmx.de>\n"
 "Language-Team: daddelfalk\n"
 "Language: \n"
@@ -144,4 +144,7 @@ msgstr "Taste Rot"
 
 msgid "YELLOW key"
 msgstr "Taste Gelb"
+
+msgid "Green key"
+msgstr "Taste Grün"
 
