@@ -100,7 +100,7 @@ class ScSelection(Screen):
 		ppanelFileName = '/etc/ppanels/' + self.softcams.value + '.xml'
 		if os.path.isfile(ppanelFileName) and os.path.isdir('/usr/lib/enigma2/python/Plugins/Extensions/PPanel'):
 			from Plugins.Extensions.PPanel.ppanel import PPanel
-			self.session.open(PPanel, name = 'CCcam PPanel', node = None, filename = ppanelFileName, deletenode = None)
+			self.session.open(PPanel, name = self.softcams.value + ' PPanel', node = None, filename = ppanelFileName, deletenode = None)
 		else:
 			return 0
 
