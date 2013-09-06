@@ -47,6 +47,7 @@ class ScSelection(Screen):
 				"ok": self.ok,
 				"green": self.save,
 				"red": self.cancel,
+				"blue": self.ppanelShortcut,
 			},-1)
 
 		self.list = [ ]
@@ -94,6 +95,14 @@ class ScSelection(Screen):
 		
 	def ok(self):
 		self["entries"].handleKey(KEY_OK)
+
+	def ppanelShortcut(self):
+		ppanelFileName = '/etc/ppanels/' + self.softcams.value + '.xml'
+		if os.path.isfile(ppanelFileName) and os.path.isdir('/usr/lib/enigma2/python/Plugins/Extensions/PPanel'):
+			from Plugins.Extensions.PPanel.ppanel import PPanel
+			self.session.open(PPanel, name = 'CCcam PPanel', node = None, filename = ppanelFileName, deletenode = None)
+		else:
+			return 0
 
 	def restart(self, what):
 		self.what = what
