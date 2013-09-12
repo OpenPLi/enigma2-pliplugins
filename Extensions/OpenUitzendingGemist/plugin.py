@@ -589,7 +589,6 @@ class OpenUg(Screen):
 		if callback is not None and len(callback):
 			self.clearList()
 			self.level = self.UG_LEVEL_SERIE
-			print "[UG] testing!"
 			if self.isRtl == False:
 				print "[UG] isRtl = False!"
 				self.getMediaData(self.mediaList, self.HBBTV_UG_BASE_URL + "search/protocol/html/searchString/" + callback)
@@ -598,7 +597,6 @@ class OpenUg(Screen):
 				print "[UG] isRtl = True!"
 				self.getRTLSerie(self.mediaList, "search.php?q=*" + callback + "*")
 				self.updateMenu()
-			print "[UG] testing2!"
 			if len(self.mediaList) == 0:
 				self.session.openWithCallback(self.close, MessageBox, _("No items matching your search criteria were found"), MessageBox.TYPE_ERROR, timeout=5, simple = True)
 		else:
@@ -691,9 +689,7 @@ class OpenUg(Screen):
 
 	def doUGPlay(self):
 		url = self.UG_BASE_URL + "/streams/video/pr_id/" + self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL]
-		print "[UG] %s" % url 
 		out = wgetUrl(url)
-		print "[UG] %s" % out
 		if out !='':
 			url = out.split('stream_link":"')[1].split('\",')[0].replace('\/', '/')
 			if url != '':
@@ -893,11 +889,6 @@ class OpenUg(Screen):
 
 				if stream and date and name and short and icon:
 					icon_type = self.getIconType(icon)
-					print "[UG] name: %s" % name
-					print "[UG] short: %s" % short
-					print "[UG] channel: %s" % channel
-					print "[UG] stream: %s" % stream
-					print "[UG] date: %s" % date
 					weekList.append((date, name, short, channel, stream, icon, icon_type, False))
 					state = 0
 
