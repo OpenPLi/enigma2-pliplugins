@@ -44,6 +44,12 @@ def wgetUrl(target):
 		return ''
 	return outtxt
 
+def wgetUrlRefer(target, refer):
+	req = Request(target)
+	req.add_header('Referer', refer)
+	r = urlopen2(req)
+	outtxt = r.read()
+	return outtxt
 
 def MPanelEntryComponent(channel, text, png):
 	res = [ text ]
@@ -225,7 +231,7 @@ class OpenUgConfigureScreen(Screen, ConfigListScreen):
 		self["config"].list = self.list
 		self.list.append(getConfigListEntry(_("Show pictures"), config.plugins.OpenUitzendingGemist.showpictures))
 		self["config"].l.setList(self.list)
-		
+
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
@@ -273,6 +279,7 @@ class OpenUgSetupScreen(Screen):
 		self.mmenu.append((_("RTL XL A-Z"), 'rtl'))
 		self.mmenu.append((_("RTL XL Gemist"), 'rtlback'))
 		self.mmenu.append((_("RTL XL Search"), 'rsearch'))
+		self.mmenu.append((_("SBS6 Gemist"), 'sbs'))
 		self.mmenu.append((_("Setup"), 'setup'))
 		self["menu"] = MenuList(self.mmenu)
 
@@ -306,6 +313,8 @@ class OpenUgSetupScreen(Screen):
 				self.session.open(DaysBackScreen)
 			elif selection[1] == 'rsearch':
 				self.isRtl = True
+				self.session.open(OpenUg, selection[1])
+			elif selection[1] == 'sbs':
 				self.session.open(OpenUg, selection[1])
 			elif selection[1] == 'setup':
 				self.session.open(OpenUgConfigureScreen)
@@ -427,6 +436,8 @@ class OpenUg(Screen):
 	UG_BASE_URL = "http://hbbtv.distributie.publiekeomroep.nl"
 	HBBTV_UG_BASE_URL = UG_BASE_URL + "/nu/ajax/action/"
 	RTL_BASE_URL = "http://rtl.ksya.net/"
+	SBS_BASE_URL = "http://plus-api.sbsnet.nl"
+	EMBED_BASE_URL = "http://embed.kijk.nl/?width=868&height=488&video="
 
 	def __init__(self, session, cmd):
 		self.skin = """
@@ -452,12 +463,13 @@ class OpenUg(Screen):
 		self.numOfPics = 0
 		self.isRtl = False
 		self.isRtlBack = False
+		self.isSbs = False
 		self.level = self.UG_LEVEL_ALL
 		self.cmd = cmd
 		self.timerCmd = self.TIMER_CMD_START
 
 		self.png = LoadPixmap(resolveFilename(SCOPE_PLUGINS, "Extensions/OpenUitzendingGemist/pli.png"))
-		
+
 		self.tmplist = []
 		self.mediaList = []
 
@@ -599,6 +611,15 @@ class OpenUg(Screen):
 				self.mediaProblemPopup()
 			else:
 				self.updateMenu()
+		elif retval == 'sbs':
+			self.clearList()
+			self.isSbs = True
+			self.level = self.UG_LEVEL_ALL
+			self.sbsGetProgramList(self.mediaList)
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
 		else:
 			if retval >= 128:
 				retval -=  128
@@ -714,7 +735,22 @@ class OpenUg(Screen):
 		if len(self.mediaList) == 0 or self["list"].getSelectionIndex() > len(self.mediaList) - 1:
 			return
 
-		if self.isRtl:
+		if self.isSbs:
+			if self.level == self.UG_LEVEL_ALL:
+				tmp = self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL]
+				self.clearList()
+				self.sbsGetEpisodeList(self.mediaList, tmp)
+				self.level = self.UG_LEVEL_SERIE
+				self.updateMenu()
+				self.loadPicPage()
+			elif self.level == self.UG_LEVEL_SERIE:
+				tmp = self.sbsGetMediaUrl(self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL])
+				if tmp != '':
+					myreference = eServiceReference(4097, 0, tmp)
+					myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
+					self.session.open(UGMediaPlayer, myreference, 'sbs')
+
+		elif self.isRtl:
 			if self.level == self.UG_LEVEL_ALL:
 				tmp = self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL]
 				self.clearList()
@@ -843,7 +879,7 @@ class OpenUg(Screen):
 					if ignore is False:
 						weekList.append((date, name, short, channel, stream, icon, icon_type, True))
 					state = 0
-					
+
 	def getRTLMediaDataBack(self, weekList, days):
 		url = self.RTL_BASE_URL + "?daysback=" + '%d' % (days)
 		data = wgetUrl(url)
@@ -901,7 +937,7 @@ class OpenUg(Screen):
 		data = data.split("\n")
 		for line in data:
 			if state == 0:
-				
+
 				tmp = "class=\"vid\" rel=\""
 				if tmp in line:
 					state = 1
@@ -924,6 +960,72 @@ class OpenUg(Screen):
 					icon_type = self.getIconType(icon)
 					weekList.append((date, name, '', '', stream, icon, icon_type, False))
 					state = 0
+
+	def sbsGetProgramList(self, progList):
+		out = wgetUrl('%s/stations/sbs6/pages/kijk' % (self.SBS_BASE_URL))
+		tmp = out.split('\\n')
+		for x in tmp:
+			name = ''
+			date = ''
+			stream = ''
+			icon = ''
+			icon_type = ''
+			if '<li ><a href=\\\"javascript:SBS.SecondScreen.Utils.loadPage(\'kijkdetail?videoId=' in x:
+				name = x.split('>')[2].split('<')[0]
+				stream = x.split('>')[1].split('videoId=')[1].split('\'')[0]
+				progList.append((date, name, '', '', stream, icon, icon_type, False))
+
+	def sbsGetEpisodeList(self, episodeList, uid):
+		out = wgetUrl('%s/stations/sbs6/pages/kijkdetail?videoId=%s' % (self.SBS_BASE_URL, uid))
+		data = out.split('\\n')
+		name = ''
+		date = ''
+		stream = ''
+		icon = ''
+		icon_type = ''
+		for x in data:
+			tmp = '<a href=\\"javascript:SBS.SecondScreen.Utils.loadPage(\'kijkdetail?videoId='
+			if tmp in x and '<li' not in x:
+				stream = x.split(tmp)[1].split('\'')[0]
+			tmp = '<p class=\\"program\\">'
+			if tmp in x:
+				name = x.split(tmp)[1].split('<')[0]
+			tmp = '<img src=\\"'
+			if tmp in x:
+				icon = x.split(tmp)[1].split('\\\"')[0].replace('\\', '')
+			if stream != '' and name != '' and icon != '':
+				icon_type = self.getIconType(icon)
+				episodeList.append((date, name, '', '', stream, icon, icon_type, False))
+				name = ''
+				date = ''
+				stream = ''
+				icon = ''
+				icon_type = ''
+
+	def sbsGetMediaUrl(self, uid):
+		out = wgetUrlRefer('%s%s' % (self.EMBED_BASE_URL, uid), '%s/kijkframe.php?videoId=%sW&width=868&height=488' % (self.SBS_BASE_URL, uid))
+		data = out.split('\n')
+		for x in data:
+			tmp = '\"myExperience'
+			if tmp in x:
+				myexp = x.split(tmp)[1].split('\\')[0]
+			tmp = 'param name=\\\"playerID\\\" value=\\\"'
+			if tmp in x:
+				id = x.split(tmp)[1].split('\\')[0]
+			tmp = '<param name=\\\"playerKey\\\" value=\\\"'
+			if tmp in x:
+				key = x.split(tmp)[1].split('\\')[0]
+			tmp = '<param name=\\\"@videoPlayer\\\" value=\\\"'
+			if tmp in x:
+				vplayer = x.split('<param name=\\\"@videoPlayer\\\" value=\\\"')[1].split('\\')[0]
+		target = "http://c.brightcove.com/services/viewer/htmlFederated?&width=868&height=488&flashID=myExperience%s&bgcolor=%%23FFFFFF&playerID=%s&playerKey=%s&isVid=true&isUI=true&dynamicStreaming=true&wmode=opaque&%%40videoPlayer=%s&branding=sbs&playertitle=true&autoStart=&debuggerID=&refURL=%s/kijkframe.php?videoId=%s&width=868&height=488" % (myexp, id, key, vplayer, self.SBS_BASE_URL, uid)
+		url = ''
+		out = wgetUrlRefer(target, '%snVRacFLQpwoE_' % (self.EMBED_BASE_URL))
+		tmp = out.split('{')
+		for x in tmp:
+			if 'defaultURL\":' in x and 'defaultURL\":null' not in x:
+				url = x.split('defaultURL\":\"')[1].split('\"')[0].replace('\\', '')
+		return url
 
 	def getIconType(self, data):
 		tmp = ".png"
