@@ -47,8 +47,11 @@ def wgetUrl(target):
 def wgetUrlRefer(target, refer):
 	req = Request(target)
 	req.add_header('Referer', refer)
-	r = urlopen2(req)
-	outtxt = r.read()
+	try:
+		r = urlopen2(req)
+		outtxt = r.read()
+	except:
+		outtxt = ''
 	return outtxt
 
 def MPanelEntryComponent(channel, text, png):
@@ -1005,6 +1008,10 @@ class OpenUg(Screen):
 	def sbsGetMediaUrl(self, uid):
 		out = wgetUrlRefer('%s%s' % (self.EMBED_BASE_URL, uid), '%s/kijkframe.php?videoId=%sW&width=868&height=488' % (self.SBS_BASE_URL, uid))
 		data = out.split('\n')
+		myexp = ''
+		id = ''
+		key = ''
+		vplayer = ''
 		for x in data:
 			tmp = '\"myExperience'
 			if tmp in x:
@@ -1018,13 +1025,14 @@ class OpenUg(Screen):
 			tmp = '<param name=\\\"@videoPlayer\\\" value=\\\"'
 			if tmp in x:
 				vplayer = x.split('<param name=\\\"@videoPlayer\\\" value=\\\"')[1].split('\\')[0]
-		target = "http://c.brightcove.com/services/viewer/htmlFederated?&width=868&height=488&flashID=myExperience%s&bgcolor=%%23FFFFFF&playerID=%s&playerKey=%s&isVid=true&isUI=true&dynamicStreaming=true&wmode=opaque&%%40videoPlayer=%s&branding=sbs&playertitle=true&autoStart=&debuggerID=&refURL=%s/kijkframe.php?videoId=%s&width=868&height=488" % (myexp, id, key, vplayer, self.SBS_BASE_URL, uid)
 		url = ''
-		out = wgetUrlRefer(target, '%snVRacFLQpwoE_' % (self.EMBED_BASE_URL))
-		tmp = out.split('{')
-		for x in tmp:
-			if 'defaultURL\":' in x and 'defaultURL\":null' not in x:
-				url = x.split('defaultURL\":\"')[1].split('\"')[0].replace('\\', '')
+		if myexp != '' and id != '' and key != '' and vplayer != '':
+			target = "http://c.brightcove.com/services/viewer/htmlFederated?&width=868&height=488&flashID=myExperience%s&bgcolor=%%23FFFFFF&playerID=%s&playerKey=%s&isVid=true&isUI=true&dynamicStreaming=true&wmode=opaque&%%40videoPlayer=%s&branding=sbs&playertitle=true&autoStart=&debuggerID=&refURL=%s/kijkframe.php?videoId=%s&width=868&height=488" % (myexp, id, key, vplayer, self.SBS_BASE_URL, uid)
+			out = wgetUrlRefer(target, '%s%s' % (self.EMBED_BASE_URL, uid))
+			tmp = out.split('{')
+			for x in tmp:
+				if 'defaultURL\":' in x and 'defaultURL\":null' not in x:
+					url = x.split('defaultURL\":\"')[1].split('\"')[0].replace('\\', '')
 		return url
 
 	def getIconType(self, data):
