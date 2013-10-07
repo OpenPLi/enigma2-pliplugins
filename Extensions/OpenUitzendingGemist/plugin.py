@@ -286,7 +286,9 @@ class OpenUgSetupScreen(Screen):
 		self.mmenu.append((_("RTL XL A-Z"), 'rtl'))
 		self.mmenu.append((_("RTL XL Gemist"), 'rtlback'))
 		self.mmenu.append((_("RTL XL Search"), 'rsearch'))
+		self.mmenu.append((_("NET5 Gemist"), 'net5'))
 		self.mmenu.append((_("SBS6 Gemist"), 'sbs'))
+		self.mmenu.append((_("Veronica Gemist"), 'veronica'))
 		self.mmenu.append((_("Setup"), 'setup'))
 		self["menu"] = MenuList(self.mmenu)
 
@@ -321,7 +323,11 @@ class OpenUgSetupScreen(Screen):
 			elif selection[1] == 'rsearch':
 				self.isRtl = True
 				self.session.open(OpenUg, selection[1])
+			elif selection[1] == 'net5':
+				self.session.open(OpenUg, selection[1])
 			elif selection[1] == 'sbs':
+				self.session.open(OpenUg, selection[1])
+			elif selection[1] == 'veronica':
 				self.session.open(OpenUg, selection[1])
 			elif selection[1] == 'setup':
 				self.session.open(OpenUgConfigureScreen)
@@ -471,6 +477,7 @@ class OpenUg(Screen):
 		self.isRtl = False
 		self.isRtlBack = False
 		self.isSbs = False
+		self.channel = ''
 		self.level = self.UG_LEVEL_ALL
 		self.cmd = cmd
 		self.timerCmd = self.TIMER_CMD_START
@@ -618,9 +625,30 @@ class OpenUg(Screen):
 				self.mediaProblemPopup()
 			else:
 				self.updateMenu()
+		elif retval == 'net5':
+			self.clearList()
+			self.isSbs = True
+			self.channel = retval
+			self.level = self.UG_LEVEL_ALL
+			self.sbsGetProgramList(self.mediaList)
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
 		elif retval == 'sbs':
 			self.clearList()
 			self.isSbs = True
+			self.channel = retval
+			self.level = self.UG_LEVEL_ALL
+			self.sbsGetProgramList(self.mediaList)
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
+		elif retval == 'veronica':
+			self.clearList()
+			self.isSbs = True
+			self.channel = retval
 			self.level = self.UG_LEVEL_ALL
 			self.sbsGetProgramList(self.mediaList)
 			if len(self.mediaList) == 0:
@@ -969,7 +997,7 @@ class OpenUg(Screen):
 					state = 0
 
 	def sbsGetProgramList(self, progList):
-		out = wgetUrl('%s/stations/sbs6/pages/kijk' % (self.SBS_BASE_URL))
+		out = wgetUrl('%s/stations/%s/pages/kijk' % (self.SBS_BASE_URL, self.channel))
 		tmp = out.split('\\n')
 		for x in tmp:
 			name = ''
@@ -983,7 +1011,7 @@ class OpenUg(Screen):
 				progList.append((date, name, '', '', stream, icon, icon_type, False))
 
 	def sbsGetEpisodeList(self, episodeList, uid):
-		out = wgetUrl('%s/stations/sbs6/pages/kijkdetail?videoId=%s' % (self.SBS_BASE_URL, uid))
+		out = wgetUrl('%s/stations/%s/pages/kijkdetail?videoId=%s' % (self.SBS_BASE_URL, self.channel, uid))
 		data = out.split('\\n')
 		name = ''
 		date = ''
