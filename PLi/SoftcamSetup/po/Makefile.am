@@ -1,3 +1,3 @@
 PLUGIN = SoftcamSetup
-LANGS = de el cs hu nl ru pl sl fa sv pt_BR no fr
+LANGS = cs de el fa fi fr hu nl no pl pt_BR ru sl sv
 include $(top_srcdir)/Rules-po.mak
