@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SoftcamSetup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-06 11:52+0100\n"
+"POT-Creation-Date: 2013-12-14 12:55+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: blzr <blzr@o2.pl>\n"
 "Language-Team: \n"
@@ -56,6 +56,10 @@ msgstr "Restartuj cardserver"
 msgid "Restart both"
 msgstr "Restartuj oba"
 
+#
+msgid "Show softcam setup in extensions menu"
+msgstr "SoftcamSetup w menu rozszerzeń"
+
 #: Sc.py:74
 msgid "Cancel"
 msgstr "Anuluj"
@@ -63,6 +67,10 @@ msgstr "Anuluj"
 #: Sc.py:75
 msgid "OK"
 msgstr "OK"
+
+#
+msgid "Info"
+msgstr ""
 
 #: Sc.py:91
 msgid "Please wait, restarting softcam and cardserver."
