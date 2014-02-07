@@ -11,7 +11,7 @@ def main(session, **kwargs):
 
 def menu(menuid, **kwargs):
 	if menuid == "cam":
-		return [(_("Softcam setup..."), main, "softcam_setup", 45)]
+		return [(_("Softcam setup..."), main, "softcam_setup", -1)]
 	return []
 
 def Plugins(**kwargs):
