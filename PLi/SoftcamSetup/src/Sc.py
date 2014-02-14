@@ -2,7 +2,7 @@ from . import _
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.FileList import FileEntryComponent, FileList
-from Components.MenuList import MenuList
+from Components.ConfigList import ConfigListScreen
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
 from Components.Label import Label
@@ -25,10 +25,10 @@ class ConfigAction(ConfigElement):
 	def getMulti(self, dummy):
 		pass
 
-class ScSelection(Screen):
+class ScSelection(Screen, ConfigListScreen):
 	skin = """
 	<screen name="ScSelection" position="center,center" size="560,250" >
-		<widget name="entries" position="5,10" size="550,160" />
+		<widget name="config" position="5,10" size="550,160" />
 		<ePixmap name="red" position="0,210" zPosition="1" size="140,40" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
 		<ePixmap name="green" position="140,210" zPosition="1" size="140,40" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
 		<ePixmap name="blue" position="420,210" zPosition="1" size="140,40" pixmap="skin_default/buttons/blue.png" transparent="1" alphatest="on" />
@@ -43,10 +43,7 @@ class ScSelection(Screen):
 
 		self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "CiSelectionActions"],
 			{
-				"left": self.keyLeft,
-				"right": self.keyRight,
 				"cancel": self.cancel,
-				"ok": self.ok,
 				"green": self.save,
 				"red": self.cancel,
 				"blue": self.ppanelShortcut,
@@ -57,10 +54,7 @@ class ScSelection(Screen):
 		self.softcam = CamControl('softcam')
 		self.cardserver = CamControl('cardserver')
 
-		menuList = ConfigList(self.list)
-		menuList.list = self.list
-		menuList.l.setList(self.list)
-		self["entries"] = menuList
+		ConfigListScreen.__init__(self, self.list, session = session)
 
 		softcams = self.softcam.getList()
 		cardservers = self.cardserver.getList()
@@ -90,15 +84,6 @@ class ScSelection(Screen):
 
 	def layoutFinished(self):
 		self.setTitle(self.setup_title)
-
-	def keyLeft(self):
-		self["entries"].handleKey(KEY_LEFT)
-
-	def keyRight(self):
-		self["entries"].handleKey(KEY_RIGHT)
-		
-	def ok(self):
-		self["entries"].handleKey(KEY_OK)
 
 	def ppanelShortcut(self):
 		ppanelFileName = '/etc/ppanels/' + self.softcams.value + '.xml'
