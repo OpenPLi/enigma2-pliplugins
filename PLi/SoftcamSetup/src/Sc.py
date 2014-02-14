@@ -36,7 +36,7 @@ class ScSelection(Screen):
 		<widget name="key_green" position="140,210" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 		<widget name="key_blue" position="420,210" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 	</screen>"""
-	def __init__(self, session):
+	def __init__(self, session, showExtentionMenuOption):
 		Screen.__init__(self, session)
 
 		self.setup_title = _("Softcam setup")
@@ -79,7 +79,8 @@ class ScSelection(Screen):
 			self.list.append(getConfigListEntry(_("Restart cardserver"), ConfigAction(self.restart, "c"))) 
 			self.list.append(getConfigListEntry(_("Restart both"), ConfigAction(self.restart, "sc")))
 
-		self.list.append(getConfigListEntry(_("Show softcam setup in extensions menu"), config.misc.softcam_setup.extension_menu))
+		if showExtentionMenuOption:
+			self.list.append(getConfigListEntry(_("Show softcam setup in extensions menu"), config.misc.softcam_setup.extension_menu))
 
 		self["key_red"] = Label(_("Cancel"))
 		self["key_green"] = Label(_("OK"))

@@ -1,17 +1,18 @@
 from . import _
 from Plugins.Plugin import PluginDescriptor
 from Components.config import config, ConfigSubsection, ConfigYesNo
+from Tools.BoundFunction import boundFunction
 
 config.misc.softcam_setup = ConfigSubsection()
 config.misc.softcam_setup.extension_menu = ConfigYesNo(default = True)
 
-def main(session, **kwargs):
+def main(session, showExtentionMenuOption=False, **kwargs):
 	import Sc
-	session.open(Sc.ScSelection)
+	session.open(Sc.ScSelection, showExtentionMenuOption)
 
 def menu(menuid, **kwargs):
 	if menuid == "cam":
-		return [(_("Softcam setup..."), main, "softcam_setup", -1)]
+		return [(_("Softcam setup..."), boundFunction(main, showExtentionMenuOption=True), "softcam_setup", -1)]
 	return []
 
 def Plugins(**kwargs):
