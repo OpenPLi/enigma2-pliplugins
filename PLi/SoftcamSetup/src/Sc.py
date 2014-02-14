@@ -9,6 +9,9 @@ from Components.Label import Label
 from Components.config import config, ConfigElement, ConfigSubsection, ConfigSelection, ConfigSubList, getConfigListEntry, KEY_LEFT, KEY_RIGHT, KEY_OK
 from Components.ConfigList import ConfigList
 from Components.Pixmap import Pixmap
+from Components.ScrollLabel import ScrollLabel
+from Tools.GetEcmInfo import ecm
+
 import os
 from camcontrol import CamControl
 from enigma import eTimer, eDVBCI_UI, eListboxPythonStringContent, eListboxPythonConfigContent
@@ -49,12 +52,12 @@ class ScSelection(Screen, ConfigListScreen):
 				"blue": self.ppanelShortcut,
 			},-1)
 
-		self.list = [ ]
-
 		self.softcam = CamControl('softcam')
 		self.cardserver = CamControl('cardserver')
 
+		self.list = [ ]
 		ConfigListScreen.__init__(self, self.list, session = session)
+		self["info"] = ScrollLabel("".join(ecm))
 
 		softcams = self.softcam.getList()
 		cardservers = self.cardserver.getList()
