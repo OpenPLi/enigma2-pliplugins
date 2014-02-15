@@ -7,8 +7,8 @@ config.misc.softcam_setup = ConfigSubsection()
 config.misc.softcam_setup.extension_menu = ConfigYesNo(default = True)
 
 def main(session, showExtentionMenuOption=False, **kwargs):
-	import Sc
-	session.open(Sc.ScSelection, showExtentionMenuOption)
+	import SoftcamSetup
+	session.open(SoftcamSetup.SoftcamSetup, showExtentionMenuOption)
 
 def menu(menuid, **kwargs):
 	if menuid == "cam":
