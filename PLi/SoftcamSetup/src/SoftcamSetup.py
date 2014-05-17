@@ -10,7 +10,7 @@ from Components.config import config, ConfigElement, ConfigSubsection, ConfigSel
 from Components.ConfigList import ConfigList
 from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
-from Tools.GetEcmInfo import ecm
+from Tools.GetEcmInfo import getECM
 
 import os
 from camcontrol import CamControl
@@ -58,7 +58,7 @@ class SoftcamSetup(Screen, ConfigListScreen):
 
 		self.list = [ ]
 		ConfigListScreen.__init__(self, self.list, session = session)
-		self["info"] = ScrollLabel("".join(ecm))
+		self["info"] = ScrollLabel("".join(getECM()))
 
 		softcams = self.softcam.getList()
 		cardservers = self.cardserver.getList()
