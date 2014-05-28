@@ -27,6 +27,7 @@ from datetime import date, timedelta
 import time
 import urlparse
 import httplib
+import base64
 
 
 
@@ -37,7 +38,7 @@ config.plugins.OpenUitzendingGemist.Npolivestreams = ConfigBoolean(default = Fal
 
 def wgetUrl(target):
 	std_headers = {
-		'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',
+		'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:28.0) Gecko/20100101 Firefox/28.0',
 		'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
 		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 		'Accept-Language': 'en-us,en;q=0.5',
@@ -492,6 +493,7 @@ class SmallScreen(Screen):
 			self.ttitle = "InternetTV"
 			self.mmenu.append((_("Dumpert.nl"), 'dumpert'))
 			self.mmenu.append((_("VKMag.com"), 'vkmag'))
+			self.mmenu.append((_("luckytv.nl"), 'luckytv'))
 			self.mmenu.append((_("Livestreams"), 'livestreams'))
 		elif cmd == 'dumpert':
 			self.ttitle = "Dumpert.nl"
@@ -500,6 +502,9 @@ class SmallScreen(Screen):
 		elif cmd == 'vkmag':
 			self.ttitle = "vkmag.com"
 			self.mmenu.append((_("Video's"), 'vkmagVid'))
+		elif cmd == 'luckytv':
+			self.ttitle = "luckytv.nl"
+			self.mmenu.append((_("Video's"), 'luckytvVid'))
 		elif cmd == 'Rver':
 			self.ttitle = "Radio Veronica"
 			self.mmenu.append((_("highlights"), 'Rverhighlights'))
@@ -929,7 +934,7 @@ class OpenUg(Screen):
 			self.clearList()
 			self.choice = 'dumpert'
 			self.level = self.UG_LEVEL_SERIE
-			self.dumpert(self.mediaList, "")
+			self.dumpert(self.mediaList, "/filmpjes/")
 			if len(self.mediaList) == 0:
 				self.mediaProblemPopup()
 			else:
@@ -960,6 +965,16 @@ class OpenUg(Screen):
 			self.choice = 'vkmagvideo'
 			self.level = self.UG_LEVEL_SERIE
 			self.vkmag(self.mediaList, 'http://www.vkmag.com/magazine/video_archive')
+			if len(self.mediaList) == 0:
+				self.mediaProblemPopup()
+			else:
+				self.updateMenu()
+		elif retval == 'luckytvVid':
+			self.title = "Luckytv"
+			self.clearList()
+			self.choice = 'luckytvvideo'
+			self.level = self.UG_LEVEL_SERIE
+			self.luckytv(self.mediaList, 'http://www.luckymedia.nl/luckytv/category/dwdd/')
 			if len(self.mediaList) == 0:
 				self.mediaProblemPopup()
 			else:
@@ -1126,6 +1141,12 @@ class OpenUg(Screen):
 				self.session.open(UGMediaPlayer, myreference, True, True, True)
 		elif self.choice == 'vkmagvideo':
 			tmp = self.getvkmagStream(self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL])
+			if tmp != '':
+				myreference = eServiceReference(4097, 0, tmp)
+				myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
+				self.session.open(UGMediaPlayer, myreference, True, True)
+		elif self.choice == 'luckytvvideo':
+			tmp = self.getluckytvStream(self.mediaList[self["list"].getSelectionIndex()][self.UG_STREAMURL])
 			if tmp != '':
 				myreference = eServiceReference(4097, 0, tmp)
 				myreference.setName(self.mediaList[self["list"].getSelectionIndex()][self.UG_PROGNAME])
@@ -1532,7 +1553,7 @@ class OpenUg(Screen):
 		return url
 
 	def dumpert(self, mediaList, url):
-		data = wgetUrlCookie(self.DUMPERT_BASE_URL + url, 'filter=video')
+		data = wgetUrlCookie(self.DUMPERT_BASE_URL + url, 'nsfw=1')
 		data = Csplit(data, '<section id="content">',1)
 		data = Csplit(data, '<div id="footcontainer">', 0)
 		nexturl = ''
@@ -1556,6 +1577,9 @@ class OpenUg(Screen):
 				if 'class="dumpthumb"' in line:
 					state = 1
 			if state == 1:
+				if '<span class="video"></span>' in line:
+					state = 2
+			if state == 2:
 				stream = line.split('<a href="')[1].split('"')[0]
 				tmp = 'title="'
 				if tmp in line:
@@ -1580,12 +1604,23 @@ class OpenUg(Screen):
 	def getDumpertStream(self, url):
 		data = wgetUrl(url)
 		url = ''
-		data = Csplit(data, '<section id="content">', 1)
+		data = Csplit(data, '<div class="dump-player">', 1)
 		data = Csplit(data, '<div id="commentscontainer">', 0)
-		tmp = 'data-vidurl="'
+		tmp = 'class="videoplayer"'
 		if tmp in data:
-			url = data.split(tmp)[1].split('"')[0]
-		return url
+			tmp = 'data-files="'
+			if tmp in data:
+				url = data.split(tmp)[1].split('"')[0]
+				url = base64.b64decode(url)
+				url = url.replace("{","").replace("}","").split(",")
+				for line in url:
+					if '"720p"' in line:
+						vidurl = line.split('":"')[1].replace("\/","/").replace('"','')
+						return vidurl
+					if '"tablet"' in line:
+						vidurl = line.split('":"')[1].replace("\/","/").replace('"','')
+				return vidurl
+		return
 
 	def rver(self, mediaList, url):
 		data = wgetUrl(url)
@@ -1704,6 +1739,49 @@ class OpenUg(Screen):
 					name = line.split(tmp)[1].split('</a>')[0]
 				mediaList.append((date, name, short, channel, stream, icon, '', True))
 				state = 0
+
+	def luckytv(self, mediaList, url):
+		data = wgetUrl(url)
+		data = Csplit(data, '<div id="main" class="clearfix"><div id="content">', 1)
+		data = Csplit(data, '<div id="sidebar">', 0)
+		data = Csplit(data, '<div class="post', )
+		state = 0
+		name = ''
+		short = ''
+		icon = ''
+		stream = ''
+		date = ''
+		channel = ''
+		for line in data:
+			if state == 0:
+				if '<a href="' in line:
+					state = 1
+			if state == 1:
+				stream = line.split('<a href="')[1].split('"')[0]
+				tmp = 'title="'
+				if tmp in line:
+					name = line.split(tmp)[1].split('"')[0]
+				tmp = '<img class="border small left" src="'
+				if tmp in line:
+					icon = line.split(tmp)[1].split('"')[0]
+				tmp = '<div class="date">'
+				if tmp in line:
+					date = line.split(tmp)[1].split('</div>')[0]
+				mediaList.append((date, name, short, channel, stream, icon, '', True))
+				state = 0
+
+	def getluckytvStream(self, url):
+		data = wgetUrl(url)
+		url = ''
+		data = Csplit(data, '<div id="content">', 1)
+		tmp = '<a href="'
+		while tmp in data:
+			url = data.split(tmp)[1].split('"')[0]
+			if '.mp4' in url:
+				return url
+			else:
+				data = data.split(tmp)[1]
+		return ''
 
 	def getIconType(self, data):
 		tmp = ".png"
