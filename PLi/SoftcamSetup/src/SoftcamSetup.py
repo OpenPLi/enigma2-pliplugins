@@ -10,7 +10,7 @@ from Components.config import config, ConfigElement, ConfigSubsection, ConfigSel
 from Components.ConfigList import ConfigList
 from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel
-from Tools.GetEcmInfo import getECM
+from Tools.GetEcmInfo import GetEcmInfo
 
 import os
 from camcontrol import CamControl
@@ -53,12 +53,18 @@ class SoftcamSetup(Screen, ConfigListScreen):
 				"blue": self.ppanelShortcut,
 			},-1)
 
+		self.list = [ ]
+		ConfigListScreen.__init__(self, self.list, session = session)
+
 		self.softcam = CamControl('softcam')
 		self.cardserver = CamControl('cardserver')
 
-		self.list = [ ]
-		ConfigListScreen.__init__(self, self.list, session = session)
-		self["info"] = ScrollLabel("".join(getECM()))
+		self.ecminfo = GetEcmInfo()
+		(newEcmFound, ecmInfo) = self.ecminfo.getEcm()
+		self["info"] = ScrollLabel("".join(ecmInfo))
+		self.EcmInfoPollTimer = eTimer()
+		self.EcmInfoPollTimer.callback.append(self.setEcmInfo)
+		self.EcmInfoPollTimer.start(1000)
 
 		softcams = self.softcam.getList()
 		cardservers = self.cardserver.getList()
@@ -85,6 +91,11 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		self["key_blue"] = Label(_("Info"))
 
 		self.onLayoutFinish.append(self.layoutFinished)
+
+	def setEcmInfo(self):
+		(newEcmFound, ecmInfo) = self.ecminfo.getEcm()
+		if newEcmFound:
+			self["info"].setText("".join(ecmInfo))
 
 	def layoutFinished(self):
 		self.setTitle(self.setup_title)
