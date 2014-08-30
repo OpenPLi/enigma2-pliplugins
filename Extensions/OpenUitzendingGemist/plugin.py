@@ -221,7 +221,7 @@ class UGMediaPlayer(Screen, InfoBarNotifications, InfoBarSeek):
 			if self.shown:
 				self.__setHideTimer()
 		self.state = self.STATE_PLAYING
-		self.session.nav.playService(self.service)
+		self.session.nav.playService(self.service, adjust=False)
 		if self.shown:
 			self.__setHideTimer()
 
