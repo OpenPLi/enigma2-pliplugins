@@ -1,4 +1,5 @@
 import os
+import enigma
 
 class CamControl:
 	'''CAM convention is that a softlink named /etc/init.c/softcam.* points
@@ -28,7 +29,7 @@ class CamControl:
 	def command(self, cmd):
 		if os.path.exists(self.link):
 			print "Executing", self.link + ' ' + cmd
-			os.system(self.link + ' ' + cmd)
+			enigma.eConsoleAppContainer().execute(self.link + ' ' + cmd)
 
 	def select(self, which):
 		print "Selecting CAM:", which
