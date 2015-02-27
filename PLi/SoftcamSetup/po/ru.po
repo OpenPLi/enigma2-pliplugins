@@ -18,53 +18,53 @@ msgstr ""
 
 #: plugin.py:9
 msgid "Softcam setup..."
-msgstr ""
+msgstr "Настройки эмулятора..."
 
 #: plugin.py:13
 msgid "Softcam setup"
-msgstr ""
+msgstr "Настройки эмулятора"
 
 #: plugin.py:13
 msgid "Lets you configure your softcams"
-msgstr ""
+msgstr "Выбор и настройка эмуляторов"
 
 #: Sc.py:63
 msgid "Select Softcam"
-msgstr ""
+msgstr "Выбор эмулятора"
 
 #: Sc.py:67
 msgid "Select Card Server"
-msgstr ""
+msgstr "Выбор кардсервера"
 
 #: Sc.py:69
 msgid "Restart softcam"
-msgstr ""
+msgstr "Рестарт эмулятора"
 
 #: Sc.py:71
 msgid "Restart cardserver"
-msgstr ""
+msgstr "Рестарт кардсервера"
 
 #: Sc.py:72
 msgid "Restart both"
-msgstr ""
+msgstr "Обе перезагрузки"
 
 #: Sc.py:74
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: Sc.py:75
 msgid "OK"
-msgstr ""
+msgstr "ОК"
 
 #: Sc.py:91
 msgid "Please wait, restarting softcam and cardserver."
-msgstr ""
+msgstr "Пожалуйста, подождите, выполняется рестарт эмулятора и кардсервера."
 
 #: Sc.py:93
 msgid "Please wait, restarting softcam."
-msgstr ""
+msgstr "Пожалуйста, подождите, выполняется рестарт эмулятора."
 
 #: Sc.py:95
 msgid "Please wait, restarting cardserver."
-msgstr ""
+msgstr "Пожалуйста, подождите, выполняется рестарт кардсервера."
 
