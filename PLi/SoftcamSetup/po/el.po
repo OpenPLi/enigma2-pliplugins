@@ -1,51 +1,74 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: SoftcamSetup\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-06-02 03:02+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: MCelliot_g <mcelliot_g@hotmail.com>\n"
+"Language-Team: MCelliot_g <mcelliot_g@hotmail.com>\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.7\n"
-"Project-Id-Version: SoftcamSetup\n"
-"Language: el\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: satdreamgr\n"
-"Language-Team: satdreamgr <satdreamgr.com>\n"
+"X-Generator: Poedit 1.7.7\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: plugin.py:15
 msgid "Softcam setup..."
-msgstr "Ρυθμίσεις Softcam"
+msgstr "Ρυθμίσεις softcam..."
 
+#: plugin.py:19 SoftcamSetup.py:46
 msgid "Softcam setup"
 msgstr "Ρυθμίσεις softcam"
 
+#: plugin.py:20
 msgid "Lets you configure your softcams"
 msgstr "Επιτρέπει τη ρύθμιση των softcam σας"
 
+#: SoftcamSetup.py:75
 msgid "Select Softcam"
 msgstr "Επιλογή Softcam"
 
+#: SoftcamSetup.py:79
 msgid "Select Card Server"
 msgstr "Επιλογή Card Server"
 
+#: SoftcamSetup.py:81
 msgid "Restart softcam"
 msgstr "Επανεκκίνηση softcam"
 
+#: SoftcamSetup.py:83
 msgid "Restart cardserver"
 msgstr "Επανεκκίνηση cardserver"
 
+#: SoftcamSetup.py:84
 msgid "Restart both"
 msgstr "Επανεκκίνηση και των δύο"
 
+#: SoftcamSetup.py:87
+msgid "Show softcam setup in extensions menu"
+msgstr "Εμφάνιση των ρυθμίσεων softcam στο μενού επεκτάσεων"
+
+#: SoftcamSetup.py:89
 msgid "Cancel"
 msgstr "Ακύρωση"
 
+#: SoftcamSetup.py:90
 msgid "OK"
 msgstr "ΟΚ"
 
+#: SoftcamSetup.py:91
+msgid "Info"
+msgstr "Πληροφορίες"
+
+#: SoftcamSetup.py:118
 msgid "Please wait, restarting softcam and cardserver."
 msgstr "Παρακαλώ περιμένετε, επανεκκίνηση softcam και cardserver."
 
+#: SoftcamSetup.py:120
 msgid "Please wait, restarting softcam."
 msgstr "Παρακαλώ περιμένετε, επανεκκίνηση softcam."
 
+#: SoftcamSetup.py:122
 msgid "Please wait, restarting cardserver."
 msgstr "Παρακαλώ περιμένετε, επανεκκίνηση cardserver."
