@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-06 11:52+0100\n"
+"POT-Creation-Date: 2016-06-02 03:02+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,54 +17,62 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin.py:9
+#: plugin.py:15
 msgid "Softcam setup..."
 msgstr ""
 
-#: plugin.py:13
+#: plugin.py:19 SoftcamSetup.py:46
 msgid "Softcam setup"
 msgstr ""
 
-#: plugin.py:13
+#: plugin.py:20
 msgid "Lets you configure your softcams"
 msgstr ""
 
-#: Sc.py:63
+#: SoftcamSetup.py:75
 msgid "Select Softcam"
 msgstr ""
 
-#: Sc.py:67
+#: SoftcamSetup.py:79
 msgid "Select Card Server"
 msgstr ""
 
-#: Sc.py:69
+#: SoftcamSetup.py:81
 msgid "Restart softcam"
 msgstr ""
 
-#: Sc.py:71
+#: SoftcamSetup.py:83
 msgid "Restart cardserver"
 msgstr ""
 
-#: Sc.py:72
+#: SoftcamSetup.py:84
 msgid "Restart both"
 msgstr ""
 
-#: Sc.py:74
+#: SoftcamSetup.py:87
+msgid "Show softcam setup in extensions menu"
+msgstr ""
+
+#: SoftcamSetup.py:89
 msgid "Cancel"
 msgstr ""
 
-#: Sc.py:75
+#: SoftcamSetup.py:90
 msgid "OK"
 msgstr ""
 
-#: Sc.py:91
+#: SoftcamSetup.py:91
+msgid "Info"
+msgstr ""
+
+#: SoftcamSetup.py:118
 msgid "Please wait, restarting softcam and cardserver."
 msgstr ""
 
-#: Sc.py:93
+#: SoftcamSetup.py:120
 msgid "Please wait, restarting softcam."
 msgstr ""
 
-#: Sc.py:95
+#: SoftcamSetup.py:122
 msgid "Please wait, restarting cardserver."
 msgstr ""
