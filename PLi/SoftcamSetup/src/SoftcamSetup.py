@@ -44,6 +44,8 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		Screen.__init__(self, session)
 
 		self.setup_title = _("Softcam setup")
+		from Screens.Menu import setmenu_path
+		setmenu_path(self, self.setup_title)
 
 		self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "CiSelectionActions"],
 			{
@@ -90,15 +92,10 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		self["key_green"] = Label(_("OK"))
 		self["key_blue"] = Label(_("Info"))
 
-		self.onLayoutFinish.append(self.layoutFinished)
-
 	def setEcmInfo(self):
 		(newEcmFound, ecmInfo) = self.ecminfo.getEcm()
 		if newEcmFound:
 			self["info"].setText("".join(ecmInfo))
-
-	def layoutFinished(self):
-		self.setTitle(self.setup_title)
 
 	def ppanelShortcut(self):
 		if "oscam" in self.softcams.value.lower() and os.path.isfile('/usr/lib/enigma2/python/Plugins/Extensions/OscamStatus/plugin.py'):
