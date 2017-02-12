@@ -20,10 +20,6 @@ AM_CONDITIONAL(UPDATE_PO, test "$with_po" = "yes")
 
 AC_OUTPUT([
 Makefile
-PLi/Makefile
-PLi/SoftcamSetup/Makefile
-PLi/SoftcamSetup/src/Makefile
-PLi/SoftcamSetup/po/Makefile
 Extensions/Makefile
 Extensions/UShare/Makefile
 Extensions/OpenUitzendingGemist/Makefile
