@@ -37,10 +37,10 @@ config.plugins.OpenUitzendingGemist.showpictures = ConfigBoolean(default = True)
 config.plugins.OpenUitzendingGemist.Npolivestreams = ConfigBoolean(default = False)
 config.plugins.OpenUitzendingGemist.Modern = ConfigBoolean(default = False)
 config.plugins.OpenUitzendingGemist.NPO = ConfigBoolean(default = True)
-config.plugins.OpenUitzendingGemist.RTL = ConfigBoolean(default = True)
-config.plugins.OpenUitzendingGemist.SBS = ConfigBoolean(default = True)
-config.plugins.OpenUitzendingGemist.RADIO = ConfigBoolean(default = True)
-config.plugins.OpenUitzendingGemist.INETTV = ConfigBoolean(default = True)
+config.plugins.OpenUitzendingGemist.RTL = ConfigBoolean(default = False)
+config.plugins.OpenUitzendingGemist.SBS = ConfigBoolean(default = False)
+config.plugins.OpenUitzendingGemist.RADIO = ConfigBoolean(default = False)
+config.plugins.OpenUitzendingGemist.INETTV = ConfigBoolean(default = False)
 
 def wgetUrl(target, refer='', cookie=''):
 	req = Request(target)
@@ -83,15 +83,15 @@ def Csplit(data, string, number = None):
 
 def MPanelEntryComponent(channel, text, png):
 	res = [ text ]
-	res.append((eListboxPythonMultiContent.TYPE_TEXT, 200, 15, 800, 100, 0, RT_HALIGN_LEFT|RT_WRAP|RT_VALIGN_TOP, text))
+	res.append((eListboxPythonMultiContent.TYPE_TEXT, 200, 15, 800, 115, 0, RT_HALIGN_LEFT|RT_WRAP|RT_VALIGN_TOP, text))
 	res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 10, 5, 150, 150, png))
 	return res
 
 class MPanelList(MenuList):
 	def __init__(self, list, selection = 0, enableWrapAround=True):
 		MenuList.__init__(self, list, enableWrapAround, eListboxPythonMultiContent)
-		self.l.setFont(0, gFont("Regular", 18))
-		self.l.setItemHeight(120)
+		self.l.setFont(0, gFont("Regular", 32))
+		self.l.setItemHeight(130)
 		self.selection = selection
 
 	def postWidgetCreate(self, instance):
@@ -752,7 +752,7 @@ class OpenUg(Screen):
 	UG_LEVEL_ALL = 0
 	UG_LEVEL_SERIE = 1
 	UG_LEVEL_SEASON = 2
-	MAX_PIC_PAGE = 5
+	MAX_PIC_PAGE = 25
 	TIMER_CMD_START = 0
 	TIMER_CMD_VKEY = 1
 	UG_BASE_URL = "http://hbbtv.distributie.publiekeomroep.nl"
