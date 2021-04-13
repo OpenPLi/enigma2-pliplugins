@@ -6,6 +6,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.Button import Button
 from os import system
 
+
 class UShareSetup(Screen, ConfigListScreen):
 	skin = """
 	<screen position="c-175,c-75" size="350,150" title="uShare setup">
@@ -100,8 +101,10 @@ class UShareSetup(Screen, ConfigListScreen):
 	def keyCancel(self):
 		self.close()
 
+
 def main(session, **kwargs):
 	session.open(UShareSetup)
+
 
 def Plugins(**kwargs):
 	return PluginDescriptor(name="uShare setup", description="Lets you configure uShare", where=PluginDescriptor.WHERE_PLUGINMENU, fnc=main)
