@@ -37,11 +37,11 @@ class UShareSetup(Screen, ConfigListScreen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session=self.session)
 
-		dirchoices = [ '/media/hdd', '/media/hdd/movie', '/media', '/' ]
+		dirchoices = ['/media/hdd', '/media/hdd/movie', '/media', '/']
 		defaultdir = '/media/hdd'
 		dir = defaultdir
 
-		compatibilitychoices = [ ('', 'default'), ('-x', 'xbox 360'), ('-d', 'PS3') ]
+		compatibilitychoices = [('', 'default'), ('-x', 'xbox 360'), ('-d', 'PS3')]
 		defaultcompatibility = ''
 		compatibility = defaultcompatibility
 
