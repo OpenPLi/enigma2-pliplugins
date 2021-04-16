@@ -6,6 +6,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.Button import Button
 from os import system
 
+
 class UShareSetup(Screen, ConfigListScreen):
 	skin = """
 	<screen position="c-175,c-75" size="350,150" title="uShare setup">
@@ -35,13 +36,13 @@ class UShareSetup(Screen, ConfigListScreen):
 		}, -2)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, session = self.session)
+		ConfigListScreen.__init__(self, self.list, session=self.session)
 
-		dirchoices = [ '/media/hdd', '/media/hdd/movie', '/media', '/' ]
+		dirchoices = ['/media/hdd', '/media/hdd/movie', '/media', '/']
 		defaultdir = '/media/hdd'
 		dir = defaultdir
 
-		compatibilitychoices = [ ('', 'default'), ('-x', 'xbox 360'), ('-d', 'PS3') ]
+		compatibilitychoices = [('', 'default'), ('-x', 'xbox 360'), ('-d', 'PS3')]
 		defaultcompatibility = ''
 		compatibility = defaultcompatibility
 
@@ -65,9 +66,9 @@ class UShareSetup(Screen, ConfigListScreen):
 		except IOError:
 			pass
 
-		self.dir = ConfigSelection(choices = dirchoices, default = dir)
+		self.dir = ConfigSelection(choices=dirchoices, default=dir)
 		self.list.append(getConfigListEntry(_("Directory"), self.dir))
-		self.compatibility = ConfigSelection(choices = compatibilitychoices, default = compatibility)
+		self.compatibility = ConfigSelection(choices=compatibilitychoices, default=compatibility)
 		self.list.append(getConfigListEntry(_("Compatibility"), self.compatibility))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -100,8 +101,10 @@ class UShareSetup(Screen, ConfigListScreen):
 	def keyCancel(self):
 		self.close()
 
+
 def main(session, **kwargs):
 	session.open(UShareSetup)
 
+
 def Plugins(**kwargs):
-	return PluginDescriptor(name = "uShare setup", description = "Lets you configure uShare", where = PluginDescriptor.WHERE_PLUGINMENU, fnc = main)
+	return PluginDescriptor(name="uShare setup", description="Lets you configure uShare", where=PluginDescriptor.WHERE_PLUGINMENU, fnc=main)
